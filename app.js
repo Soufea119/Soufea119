@@ -138,7 +138,7 @@ loader.load(
     function (gltf) {
         const cat = gltf.scene;
         cat.position.set(0, 0, 5); // Adjust position as needed
-        cat.scale.set(0.5, 0.5, 0.5); // Scale down if too big
+        cat.scale.set(6, 6, 6); // Scale down if too big
         self.scene.add(cat);
     },
     undefined,
