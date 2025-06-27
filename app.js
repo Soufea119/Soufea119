@@ -380,20 +380,26 @@ loader.load(
         const dt = this.clock.getDelta();
 
 	if (this.cats && this.cats.length > 0) {
-    const anyVisible = this.cats.some(cat => cat.visible);
+    const playerPos = this.dolly.position.clone();
+    const behindDir = new THREE.Vector3(0, 0, 1); // Direction behind the player
+    behindDir.applyQuaternion(this.dummyCam.quaternion).normalize();
 
-    if (anyVisible && !this.isDark) {
-        this.scene.environment = null;
-        this.scene.background = new THREE.Color(0x000000);
-        this.darkLight.visible = true;
-        this.isDark = true;
-    } else if (!anyVisible && this.isDark) {
-        this.scene.environment = this.originalEnvMap;
-        this.scene.background = this.originalBG;
-        this.darkLight.visible = false;
-        this.isDark = false;
-    }
+    this.cats.forEach((cat, i) => {
+        if (cat.visible) {
+            // Calculate a target position behind the player (with some offset)
+            const offset = 1.5 + i * 1.5;
+            const targetPos = playerPos.clone().addScaledVector(behindDir, offset);
+            targetPos.y = 0; // Keep cats on ground
+
+            // Smooth movement toward target
+            cat.position.lerp(targetPos, 0.02); // 0.02 = follow speed
+
+            // Optional: make cat face the player
+            cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
+        }
+    });
 }
+
 
 
         
