@@ -28,6 +28,10 @@ class App{
         
 		this.scene = new THREE.Scene();
                 this.scene.add( this.dolly );
+		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
+                this.darkLight.visible = false;
+                this.scene.add(this.darkLight);
+
 
 		this.originalEnvMap = null;
                 this.originalBG = null;
