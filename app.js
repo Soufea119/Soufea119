@@ -379,19 +379,22 @@ loader.load(
 	render( timestamp, frame ){
         const dt = this.clock.getDelta();
 
-	if (this.cat) {
-    if (this.cat.visible && !this.isDark) {
+	if (this.cats && this.cats.length > 0) {
+    const anyVisible = this.cats.some(cat => cat.visible);
+
+    if (anyVisible && !this.isDark) {
         this.scene.environment = null;
         this.scene.background = new THREE.Color(0x000000);
         this.darkLight.visible = true;
         this.isDark = true;
-    } else if (!this.cat.visible && this.isDark) {
+    } else if (!anyVisible && this.isDark) {
         this.scene.environment = this.originalEnvMap;
         this.scene.background = this.originalBG;
         this.darkLight.visible = false;
         this.isDark = false;
     }
 }
+
 
         
         if (this.renderer.xr.isPresenting){
