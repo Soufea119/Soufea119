@@ -144,19 +144,30 @@ self.originalBG = texture;
 				});
 
 		// Load the cat model
+// Load the cat model
 loader.load(
     'oiiaioooooiai_cat.glb',
     function (gltf) {
-        const cat = gltf.scene;
-        cat.position.set(0, 0, 5); // Adjust position as needed
-        cat.scale.set(20, 20, 20); // Scale down if too big
-        self.scene.add(cat);
+        self.cat = gltf.scene;
+        self.cat.position.set(0, 0, 5); // Adjust position as needed
+        self.cat.scale.set(20, 20, 20); // SUPER BAF CAT
+        self.cat.visible = false; // Initially hidden
+        self.scene.add(self.cat);
+
+        // Set up timer for random appearance
+        setInterval(() => {
+            if (self.cat) {
+                // 30% chance to appear
+                self.cat.visible = Math.random() < 0.3;
+            }
+        }, 4000);
     },
     undefined,
     function (error) {
         console.error('An error occurred loading the cat model:', error);
     }
 );
+
 
                        
                 const door1 = college.getObjectByName("LobbyShop_Door__1_");
