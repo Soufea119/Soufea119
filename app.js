@@ -67,24 +67,25 @@ class App{
             });
 	}
 	
-    setEnvironment(){
-        const loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
-        const pmremGenerator = new THREE.PMREMGenerator( this.renderer );
-        pmremGenerator.compileEquirectangularShader();
-        
-        const self = this;
-        
-        loader.load( './assets/hdr/night_road_1k.hdr', ( texture ) => {
+    setEnvironment() {
+    const loader = new RGBELoader().setDataType(THREE.UnsignedByteType);
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+    pmremGenerator.compileEquirectangularShader();
 
-          const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
-          pmremGenerator.dispose();
+    loader.load('./assets/hdr/moonless_golf_2k.hdr', (texture) => {
+        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
 
-          self.scene.environment = envMap;
+        this.scene.environment = envMap;
+        this.scene.background = texture; // Show HDR as background
 
-        }, undefined, (err)=>{
-            console.error( 'An error occurred setting the environment');
-        } );
-    }
+        pmremGenerator.dispose();
+    },
+    undefined,
+    (err) => {
+        console.error('Error setting environment:', err);
+    });
+}
+
     
     resize(){
         this.camera.aspect = window.innerWidth / window.innerHeight;
