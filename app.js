@@ -67,24 +67,27 @@ class App{
             });
 	}
 	
-    setEnvironment() {
+   setEnvironment() {
     const loader = new RGBELoader().setDataType(THREE.UnsignedByteType);
     const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     pmremGenerator.compileEquirectangularShader();
 
+    const self = this;
+
     loader.load('./assets/hdr/moonless_golf_2k.hdr', (texture) => {
         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
 
-        this.scene.environment = envMap;
-        this.scene.background = texture; // Show HDR as background
+        self.scene.environment = envMap;
+        self.scene.background = texture; // Shows the HDR as background
 
         pmremGenerator.dispose();
     },
     undefined,
     (err) => {
-        console.error('Error setting environment:', err);
+        console.error('An error occurred setting the environment');
     });
 }
+
 
     
     resize(){
