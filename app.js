@@ -149,21 +149,36 @@ self.originalBG = texture;
 
 		// Load the cat model
 // Load the cat model
+// Load 4 small, scattered cats
 loader.load(
     'oiiaioooooiai_cat.glb',
     function (gltf) {
-        self.cat = gltf.scene;
-        self.cat.position.set(0, 0, 5); // Adjust position as needed
-        self.cat.scale.set(20, 20, 20); // SUPER BAF CAT
-        self.cat.visible = false; // Initially hidden
-        self.scene.add(self.cat);
+        self.cats = [];
 
-        // Set up timer for random appearance
+        for (let i = 0; i < 4; i++) {
+            const cat = gltf.scene.clone();
+            
+            // Smaller scale
+            cat.scale.set(2, 2, 2);
+
+            // Random scattered position near the player
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 3 + Math.random() * 2; // 3–5 units away
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            const y = 0;
+
+            cat.position.set(x, y, z);
+            cat.visible = false; // Hidden at start
+            self.scene.add(cat);
+            self.cats.push(cat);
+        }
+
+        // Randomly show/hide each cat every 4 seconds
         setInterval(() => {
-            if (self.cat) {
-                // 30% chance to appear
-                self.cat.visible = Math.random() < 0.3;
-            }
+            self.cats.forEach(cat => {
+                cat.visible = Math.random() < 0.4; // 40% chance each cat appears
+            });
         }, 4000);
     },
     undefined,
@@ -171,7 +186,6 @@ loader.load(
         console.error('An error occurred loading the cat model:', error);
     }
 );
-
 
                        
                 const door1 = college.getObjectByName("LobbyShop_Door__1_");
