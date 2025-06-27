@@ -27,10 +27,18 @@ class App{
         this.camera.add( this.dummyCam );
         
 		this.scene = new THREE.Scene();
-        this.scene.add( this.dolly );
-        
+                this.scene.add( this.dolly );
+
+		this.originalEnvMap = null;
+                this.originalBG = null;
+                this.isDark = false;
+
 		const ambient = new THREE.HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
 		this.scene.add(ambient);
+		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
+                this.darkLight.visible = false;
+                this.scene.add(this.darkLight);
+
 
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
 		this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -78,7 +86,10 @@ class App{
         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
 
         self.scene.environment = envMap;
-        self.scene.background = texture; // Shows the HDR as background
+self.scene.background = texture;
+self.originalEnvMap = envMap;
+self.originalBG = texture;
+
 
         pmremGenerator.dispose();
     },
