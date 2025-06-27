@@ -131,6 +131,22 @@ class App{
                         }
 					}
 				});
+
+		// Load the cat model
+loader.load(
+    'oiiaioooooiai_cat.glb',
+    function (gltf) {
+        const cat = gltf.scene;
+        cat.position.set(0, 0, 5); // Adjust position as needed
+        cat.scale.set(0.5, 0.5, 0.5); // Scale down if too big
+        self.scene.add(cat);
+    },
+    undefined,
+    function (error) {
+        console.error('An error occurred loading the cat model:', error);
+    }
+);
+
                        
                 const door1 = college.getObjectByName("LobbyShop_Door__1_");
                 const door2 = college.getObjectByName("LobbyShop_Door__2_");
