@@ -148,8 +148,7 @@ self.originalBG = texture;
                         }
 					}
 				});
-
-		// Load the cat model
+				
 // Load the cat model
 // Load 4 small, scattered cats
 loader.load(
