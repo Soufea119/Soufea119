@@ -27,7 +27,9 @@ class App{
         this.camera.add( this.dummyCam );
         
 		this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0xaaaaaa, 5, 50); // ⬅️ Add this
                 this.scene.add( this.dolly );
+
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
                 this.darkLight.visible = false;
                 this.scene.add(this.darkLight);
