@@ -418,27 +418,23 @@ loader.load(
 	render( timestamp, frame ){
         const dt = this.clock.getDelta();
 
-	if (this.cats && this.cats.length > 0) {
+	if (this.cat) {
     const playerPos = this.dolly.position.clone();
-    const behindDir = new THREE.Vector3(0, 0, 1); // Direction behind the player
-    behindDir.applyQuaternion(this.dummyCam.quaternion).normalize();
 
-    this.cats.forEach((cat, i) => {
-        if (cat.visible) {
-            // Calculate a target position behind the player (with some offset)
-            const offset = 1.5 + i * 1.5;
-            const targetPos = playerPos.clone().addScaledVector(behindDir, offset);
-            targetPos.y = 0; // Keep cats on ground
+    // Direction behind the player
+    const followOffset = new THREE.Vector3(0, 0, 1.5); // 1.5 units behind
+    followOffset.applyQuaternion(this.dummyCam.quaternion);
+    const targetPos = playerPos.clone().add(followOffset);
 
-            // Smooth movement toward target
-            cat.position.lerp(targetPos, 0.02); // 0.02 = follow speed
+    targetPos.y = 0; // Keep cat on ground
 
-            // ✨ Add spin animation
-            cat.rotation.y += 0.05;
+    // Smoothly move cat toward target position
+    this.cat.position.lerp(targetPos, 0.05); // follow speed
 
-            // Optional: face player (but might conflict with spin)
-            // cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
-        } 
+    // Make the cat face the player
+    this.cat.lookAt(playerPos.x, this.cat.position.y, playerPos.z);
+}
+
     });
 }
 
