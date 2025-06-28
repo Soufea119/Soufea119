@@ -263,6 +263,13 @@ loader.load(
 	}
     
     setupXR(){
+
+	    this.renderer.xr.addEventListener('sessionstart', () => {
+    if (this.sound && this.sound.buffer && !this.sound.isPlaying) {
+        this.sound.play();
+    }
+});
+
         this.renderer.xr.enabled = true;
 
         const btn = new VRButton( this.renderer );
