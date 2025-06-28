@@ -32,7 +32,7 @@ class App{
 		this.listener = new THREE.AudioListener();
                 this.camera.add(this.listener);
 
-		const tintColor = new THREE.Color(0xff99cc); // soft pink tint
+		const tintColor = new THREE.Color(0xccff99); // soft pink tint
 
 const planeGeometry = new THREE.PlaneGeometry(2, 2);
 const planeMaterial = new THREE.MeshBasicMaterial({
