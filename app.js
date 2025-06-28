@@ -9,9 +9,9 @@ import { VRButton } from './libs/VRButton.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js'
 import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
-import { EffectComposer } from './libs/three/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from './libs/three/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from './libs/three/jsm/postprocessing/ShaderPass.js';
+import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/ShaderPass.js';
 
 const TintShader = {
     uniforms: {
@@ -33,7 +33,7 @@ const TintShader = {
             vec4 color = texture2D(tDiffuse, vUv);
             color.rgb += tint;
             gl_FragColor = color;
-        }
+        } 
     `
 };
 
