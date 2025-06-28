@@ -8,7 +8,6 @@ import { VRButton } from './libs/VRButton.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js'
 import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
-import { GLTFLoader } from './libs/three/jsm/loaders/GLTFLoader.js';
 
 
 
