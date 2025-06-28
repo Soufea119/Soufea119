@@ -487,13 +487,7 @@ loader.load(
     // Make the cat face the player
     this.cat.lookAt(playerPos.x, this.cat.position.y, playerPos.z);
 }
-
-    });
-}
-
-
-
-        
+     
         if (this.renderer.xr.isPresenting){
             let moveGaze = false;
         
