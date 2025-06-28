@@ -189,29 +189,6 @@ loader.load(
     }
 );
 
-				loadHorrorGirl() {
-    const loader = new FBXLoader().setPath(this.assetsPath);
-    const self = this;
-
-    loader.load('horror_girl.fbx', function (fbx) {
-        fbx.scale.set(0.01, 0.01, 0.01); // Adjust scale if she’s huge
-        fbx.position.copy(self.dolly.position).add(new THREE.Vector3(0, 0, -3)); // 3 units in front of player
-
-        self.scene.add(fbx);
-
-        // Animation setup
-        self.mixer = new THREE.AnimationMixer(fbx);
-        if (fbx.animations.length > 0) {
-            const action = self.mixer.clipAction(fbx.animations[0]);
-            action.play();
-        }
-
-    }, undefined, function (error) {
-        console.error('Error loading Horror Girl FBX:', error);
-    });
-}
-
-
                        
                 const door1 = college.getObjectByName("LobbyShop_Door__1_");
                 const door2 = college.getObjectByName("LobbyShop_Door__2_");
@@ -239,6 +216,28 @@ loader.load(
 			}
 		);
 	}
+
+	loadHorrorGirl() {
+    const loader = new FBXLoader().setPath(this.assetsPath);
+    const self = this;
+
+    loader.load('horror_girl.fbx', function (fbx) {
+        fbx.scale.set(0.01, 0.01, 0.01); // Adjust scale if she’s huge
+        fbx.position.copy(self.dolly.position).add(new THREE.Vector3(0, 0, -3)); // 3 units in front of player
+
+        self.scene.add(fbx);
+
+        // Animation setup
+        self.mixer = new THREE.AnimationMixer(fbx);
+        if (fbx.animations.length > 0) {
+            const action = self.mixer.clipAction(fbx.animations[0]);
+            action.play();
+        }
+
+    }, undefined, function (error) {
+        console.error('Error loading Horror Girl FBX:', error);
+    });
+}
     
     setupXR(){
         this.renderer.xr.enabled = true;
