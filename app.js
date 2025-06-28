@@ -12,7 +12,6 @@ import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFact
 
 
 
-
 class App{
 	constructor(){
 		const container = document.createElement( 'div' );
