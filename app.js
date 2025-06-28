@@ -70,7 +70,7 @@ class App {
 		this.tintOverlay.position.z = -0.5;
 
 		// Lights
-		const ambient = new THREE.HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
+		const ambient = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.8);
 		this.scene.add(ambient);
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
@@ -119,6 +119,30 @@ class App {
 			});
 	}
 
+	setEnvironment() {
+		const loader = new THREE.TextureLoader();
+		const self = this;
+
+		loader.load(
+			'./assets/skybox.jpg',
+			function (texture) {
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				self.scene.background = texture;
+				self.scene.environment = null;
+			},
+			undefined,
+			function (err) {
+				console.error('An error occurred loading the skybox:', err);
+			}
+		);
+	}
+
+	resize() {
+		this.camera.aspect = window.innerWidth / window.innerHeight;
+		this.camera.updateProjectionMatrix();
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+
 	loadWeepingAngels() {
 		const loader = new FBXLoader().setPath(this.assetsPath);
 		const self = this;
@@ -161,32 +185,6 @@ class App {
 			}
 		);
 	}
-}
-
-	
-setEnvironment() {
-		const loader = new THREE.TextureLoader();
-		const self = this;
-
-		loader.load(
-			'./assets/skybox.jpg',
-			function (texture) {
-				texture.mapping = THREE.EquirectangularReflectionMapping;
-				self.scene.background = texture;
-				self.scene.environment = null; // No HDR lighting
-			},
-			undefined,
-			function (err) {
-				console.error('An error occurred loading the skybox:', err);
-			}
-		);
-	}
-
-	resize() {
-		this.camera.aspect = window.innerWidth / window.innerHeight;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-	}
 
 	loadCollege() {
 		const loader = new GLTFLoader().setPath(this.assetsPath);
@@ -204,13 +202,13 @@ setEnvironment() {
 
 				college.traverse(function (child) {
 					if (child.isMesh) {
-						if (child.name.indexOf("PROXY") !== -1) {
+						if (child.name.includes("PROXY")) {
 							child.material.visible = false;
 							self.proxy = child;
-						} else if (child.material.name.indexOf('Glass') !== -1) {
+						} else if (child.material.name.includes('Glass')) {
 							child.material.opacity = 0.1;
 							child.material.transparent = true;
-						} else if (child.material.name.indexOf("SkyBox") !== -1) {
+						} else if (child.material.name.includes("SkyBox")) {
 							const mat1 = child.material;
 							const mat2 = new THREE.MeshBasicMaterial({ map: mat1.map });
 							child.material = mat2;
@@ -219,7 +217,21 @@ setEnvironment() {
 					}
 				});
 
-				// Load the cat model
+				// Create central pivot at lobby doors
+				const door1 = college.getObjectByName("LobbyShop_Door__1_");
+				const door2 = college.getObjectByName("LobbyShop_Door__2_");
+				if (door1 && door2) {
+					const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
+					const obj = new THREE.Object3D();
+					obj.name = "LobbyShop";
+					obj.position.copy(pos);
+					college.add(obj);
+				}
+
+				self.loadingBar.visible = false;
+				self.setupXR();
+
+				// Load cats
 				loader.load(
 					'oiiaioooooiai_cat.glb',
 					function (gltf) {
@@ -251,34 +263,17 @@ setEnvironment() {
 						console.error('An error occurred loading the cat model:', error);
 					}
 				);
-			}
-		);
-	}              const door1 = college.getObjectByName("LobbyShop_Door__1_");
-                const door2 = college.getObjectByName("LobbyShop_Door__2_");
-                const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
-                const obj = new THREE.Object3D();
-                obj.name = "LobbyShop";
-                obj.position.copy(pos);
-                college.add( obj );
-                
-                self.loadingBar.visible = false;
-			
-                self.setupXR();
 			},
-			// called while loading is progressing
-			function ( xhr ) {
-
-				self.loadingBar.progress = (xhr.loaded / xhr.total);
-				
+			function (xhr) {
+				self.loadingBar.progress = xhr.loaded / xhr.total;
 			},
-			// called when loading has errors
-			function ( error ) {
-
-				console.log( 'An error happened' );
-
+			function (error) {
+				console.log('An error happened loading college.glb');
 			}
 		);
 	}
+}
+
     
     setupXR(){
 
