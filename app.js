@@ -42,6 +42,44 @@ const planeMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.1,        // Adjust for intensity of tint
   depthTest: false     // Always renders on top
 });
+loadWeepingAngels() {
+    const loader = new FBXLoader().setPath(this.assetsPath);
+    const self = this;
+
+    loader.load('weepingangel.fbx', function (fbx) {
+        const numClones = 10;
+        self.weepingAngels = [];
+
+        for (let i = 0; i < numClones; i++) {
+            const clone = fbx.clone();
+            clone.scale.set(0.01, 0.01, 0.01);
+
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 10 + Math.random() * 10;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+
+            clone.position.set(
+                self.dolly.position.x + x,
+                0,
+                self.dolly.position.z + z
+            );
+
+            self.scene.add(clone);
+
+            const mixer = new THREE.AnimationMixer(clone);
+            if (fbx.animations && fbx.animations.length > 0) {
+                const action = mixer.clipAction(fbx.animations[0]);
+                action.play();
+            }
+
+            self.weepingAngels.push({ object: clone, mixer });
+        }
+
+    }, undefined, function (error) {
+        console.error('Error loading weepingangel.fbx:', error);
+    });
+}
 
 this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
 this.tintOverlay.material.side = THREE.DoubleSide;
@@ -222,48 +260,7 @@ loader.load(
     });
 }
 
-				loadWeepingAngels() {
-    const loader = new FBXLoader().setPath(this.assetsPath);
-    const self = this;
-
-    loader.load('weepingangel.fbx', function (fbx) {
-        const numClones = 10;
-        self.weepingAngels = [];
-
-        for (let i = 0; i < numClones; i++) {
-            const clone = fbx.clone();
-            clone.scale.set(0.01, 0.01, 0.01);
-
-            // Random scattered position in a ring
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 10 + Math.random() * 10; // 10–20 units away
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-
-            clone.position.set(
-                self.dolly.position.x + x,
-                0,
-                self.dolly.position.z + z
-            );
-
-            self.scene.add(clone);
-
-            const mixer = new THREE.AnimationMixer(clone);
-            if (fbx.animations && fbx.animations.length > 0) {
-                const action = mixer.clipAction(fbx.animations[0]);
-                action.play();
-            }
-
-            self.weepingAngels.push({ object: clone, mixer });
-        }
-
-    }, undefined, function (error) {
-        console.error('Error loading weepingangel.fbx:', error);
-    });
-}
-
-
-                       
+				   
                 const door1 = college.getObjectByName("LobbyShop_Door__1_");
                 const door2 = college.getObjectByName("LobbyShop_Door__2_");
                 const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
