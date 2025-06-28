@@ -218,8 +218,8 @@ loader.load(
     undefined,
     function (error) {
         console.error('An error occurred loading the cat model:', error);
-    }
-);
+    });
+}
 
 				loadWeepingAngels() {
     const loader = new FBXLoader().setPath(this.assetsPath);
