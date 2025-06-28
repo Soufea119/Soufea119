@@ -32,6 +32,23 @@ class App{
 		this.listener = new THREE.AudioListener();
                 this.camera.add(this.listener);
 
+		const tintColor = new THREE.Color(0xff99cc); // soft pink tint
+
+const planeGeometry = new THREE.PlaneGeometry(2, 2);
+const planeMaterial = new THREE.MeshBasicMaterial({
+  color: tintColor,
+  transparent: true,
+  opacity: 0.1,        // Adjust for intensity of tint
+  depthTest: false     // Always renders on top
+});
+
+this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
+this.tintOverlay.material.side = THREE.DoubleSide;
+
+this.camera.add(this.tintOverlay);
+this.tintOverlay.position.z = -0.5; // Slightly in front of camera
+
+
                 const audioLoader = new THREE.AudioLoader();
                 this.sound = new THREE.Audio(this.listener);
 
@@ -421,7 +438,7 @@ loader.load(
 
             // Optional: face player (but might conflict with spin)
             // cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
-        }
+        } 
     });
 }
 
