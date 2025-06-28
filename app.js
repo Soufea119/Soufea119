@@ -27,6 +27,26 @@ class App{
         this.camera.add( this.dummyCam );
         
 		this.scene = new THREE.Scene();
+		this.listener = new THREE.AudioListener();
+                this.camera.add(this.listener);
+
+                const audioLoader = new THREE.AudioLoader();
+                this.sound = new THREE.Audio(this.listener);
+
+ audioLoader.load(
+    this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
+    (buffer) => {
+        this.sound.setBuffer(buffer);
+        this.sound.setLoop(true);
+        this.sound.setVolume(0.3); // adjust volume here
+        this.sound.play();
+    },
+    undefined,
+    (err) => {
+        console.error('An error occurred loading the audio:', err);
+    }
+);
+
                 this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
 
                 this.scene.add( this.dolly );
