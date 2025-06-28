@@ -464,7 +464,7 @@ loader.load(
         }
         
         this.stats.update();
-		this.composer.render();
+		this.renderer.render(this.scene, this.camera);
 
 
 	}
