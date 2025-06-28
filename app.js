@@ -62,14 +62,15 @@ class App{
                 const audioLoader = new THREE.AudioLoader();
                 this.sound = new THREE.Audio(this.listener);
 
- audioLoader.load(
+audioLoader.load(
     this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
     (buffer) => {
         this.sound.setBuffer(buffer);
         this.sound.setLoop(true);
-        this.sound.setVolume(0.3); // adjust volume here
-        this.sound.play();
+        this.sound.setVolume(0.3);
+        // ✅ Do not play yet — wait for user gesture
     },
+
     undefined,
     (err) => {
         console.error('An error occurred loading the audio:', err);
