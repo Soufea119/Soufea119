@@ -21,6 +21,7 @@ class App {
 		this.assetsPath = './assets/';
 		this.clock = new THREE.Clock();
 
+		// Camera and Dolly
 		this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 500);
 		this.camera.position.set(0, 1.6, 0);
 
@@ -31,11 +32,30 @@ class App {
 		this.dummyCam = new THREE.Object3D();
 		this.camera.add(this.dummyCam);
 
+		// Scene
 		this.scene = new THREE.Scene();
+		this.scene.fog = new THREE.Fog(0x000000, 2, 20);
+		this.scene.add(this.dolly);
+
+		// Audio
 		this.listener = new THREE.AudioListener();
 		this.camera.add(this.listener);
+		const audioLoader = new THREE.AudioLoader();
+		this.sound = new THREE.Audio(this.listener);
+		audioLoader.load(
+			this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
+			(buffer) => {
+				this.sound.setBuffer(buffer);
+				this.sound.setLoop(true);
+				this.sound.setVolume(0.3);
+			},
+			undefined,
+			(err) => {
+				console.error('An error occurred loading the audio:', err);
+			}
+		);
 
-		// Tint overlay setup
+		// Tint Overlay
 		const tintColor = new THREE.Color(0xccff99);
 		const planeGeometry = new THREE.PlaneGeometry(2, 2);
 		const planeMaterial = new THREE.MeshBasicMaterial({
@@ -49,26 +69,54 @@ class App {
 		this.camera.add(this.tintOverlay);
 		this.tintOverlay.position.z = -0.5;
 
-		// Audio setup
-		const audioLoader = new THREE.AudioLoader();
-		this.sound = new THREE.Audio(this.listener);
+		// Lights
+		const ambient = new THREE.HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
+		this.scene.add(ambient);
 
-		audioLoader.load(
-			this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
-			(buffer) => {
-				this.sound.setBuffer(buffer);
-				this.sound.setLoop(true);
-				this.sound.setVolume(0.3);
-				// Ready to play when user interacts
-			},
-			undefined,
-			(err) => {
-				console.error('An error occurred loading the audio:', err);
-			}
-		);
+		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
+		this.darkLight.visible = false;
+		this.scene.add(this.darkLight);
 
-		// 🧟‍♀️ Load the angels
+		// State
+		this.originalEnvMap = null;
+		this.originalBG = null;
+		this.isDark = false;
+
+		// Renderer
+		this.renderer = new THREE.WebGLRenderer({ antialias: true });
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.outputEncoding = THREE.sRGBEncoding;
+		container.appendChild(this.renderer.domElement);
+
+		this.setEnvironment();
+		window.addEventListener('resize', this.resize.bind(this));
+
+		// Helpers
+		this.up = new THREE.Vector3(0, 1, 0);
+		this.origin = new THREE.Vector3();
+		this.workingVec3 = new THREE.Vector3();
+		this.workingQuaternion = new THREE.Quaternion();
+		this.raycaster = new THREE.Raycaster();
+
+		this.stats = new Stats();
+		container.appendChild(this.stats.dom);
+
+		this.loadingBar = new LoadingBar();
+
+		// Load content
 		this.loadWeepingAngels();
+		this.loadCollege();
+
+		this.immersive = false;
+
+		// Load board data
+		fetch('./college.json')
+			.then(response => response.json())
+			.then(obj => {
+				this.boardShown = '';
+				this.boardData = obj;
+			});
 	}
 
 	loadWeepingAngels() {
@@ -115,89 +163,6 @@ class App {
 	}
 }
 
-this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
-this.tintOverlay.material.side = THREE.DoubleSide;
-
-this.camera.add(this.tintOverlay);
-this.tintOverlay.position.z = -0.5; // Slightly in front of camera
-
-
-                const audioLoader = new THREE.AudioLoader();
-                this.sound = new THREE.Audio(this.listener);
-
-audioLoader.load(
-    this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
-    (buffer) => {
-        this.sound.setBuffer(buffer);
-        this.sound.setLoop(true);
-        this.sound.setVolume(0.3);
-        // ✅ Do not play yet — wait for user gesture
-    },
-
-    undefined,
-    (err) => {
-        console.error('An error occurred loading the audio:', err);
-    }
-);
-
-                this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
-
-                this.scene.add( this.dolly );
-
-		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
-                this.darkLight.visible = false;
-                this.scene.add(this.darkLight);
-
-
-		this.originalEnvMap = null;
-                this.originalBG = null;
-                this.isDark = false;
-
-		const ambient = new THREE.HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
-		this.scene.add(ambient);
-		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
-                this.darkLight.visible = false;
-                this.scene.add(this.darkLight);
-
-
-		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-
-
-		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( window.innerWidth, window.innerHeight );
-		this.renderer.outputEncoding = THREE.sRGBEncoding;
-		container.appendChild( this.renderer.domElement );
-        this.setEnvironment();
-	
-        window.addEventListener( 'resize', this.resize.bind(this) );
-        
-        this.clock = new THREE.Clock();
-        this.up = new THREE.Vector3(0,1,0);
-        this.origin = new THREE.Vector3();
-        this.workingVec3 = new THREE.Vector3();
-        this.workingQuaternion = new THREE.Quaternion();
-        this.raycaster = new THREE.Raycaster();
-        
-        this.stats = new Stats();
-		container.appendChild( this.stats.dom );
-        
-		this.loadingBar = new LoadingBar();
-
-		self.loadWeepingAngels();
-
-		this.loadCollege();
-        
-        this.immersive = false;
-        
-        const self = this;
-        
-        fetch('./college.json')
-            .then(response => response.json())
-            .then(obj =>{
-                self.boardShown = '';
-                self.boardData = obj;
-            });
-	}
 	
 setEnvironment() {
     const loader = new THREE.TextureLoader();
