@@ -14,72 +14,106 @@ import { GLTFLoader } from './libs/three/jsm/loaders/GLTFLoader.js';
 
 
 
-class App{
-	constructor(){
-		const container = document.createElement( 'div' );
-		document.body.appendChild( container );
+class App {
+	constructor() {
+		const container = document.createElement('div');
+		document.body.appendChild(container);
 
 		this.assetsPath = './assets/';
-        
-		this.camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 500 );
-		this.camera.position.set( 0, 1.6, 0 );
-        
-        this.dolly = new THREE.Object3D(  );
-        this.dolly.position.set(0, 0, 10);
-        this.dolly.add( this.camera );
-        this.dummyCam = new THREE.Object3D();
-        this.camera.add( this.dummyCam );
-        
+		this.clock = new THREE.Clock();
+
+		this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 500);
+		this.camera.position.set(0, 1.6, 0);
+
+		this.dolly = new THREE.Object3D();
+		this.dolly.position.set(0, 0, 10);
+		this.dolly.add(this.camera);
+
+		this.dummyCam = new THREE.Object3D();
+		this.camera.add(this.dummyCam);
+
 		this.scene = new THREE.Scene();
 		this.listener = new THREE.AudioListener();
-                this.camera.add(this.listener);
+		this.camera.add(this.listener);
 
-		const tintColor = new THREE.Color(0xccff99); // soft pink tint
+		// Tint overlay setup
+		const tintColor = new THREE.Color(0xccff99);
+		const planeGeometry = new THREE.PlaneGeometry(2, 2);
+		const planeMaterial = new THREE.MeshBasicMaterial({
+			color: tintColor,
+			transparent: true,
+			opacity: 0.1,
+			depthTest: false
+		});
+		this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
+		this.tintOverlay.material.side = THREE.DoubleSide;
+		this.camera.add(this.tintOverlay);
+		this.tintOverlay.position.z = -0.5;
 
-const planeGeometry = new THREE.PlaneGeometry(2, 2);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: tintColor,
-  transparent: true,
-  opacity: 0.1,        // Adjust for intensity of tint
-  depthTest: false     // Always renders on top
-});
-loadWeepingAngels() {
-    const loader = new FBXLoader().setPath(this.assetsPath);
-    const self = this;
+		// Audio setup
+		const audioLoader = new THREE.AudioLoader();
+		this.sound = new THREE.Audio(this.listener);
 
-    loader.load('weepingangel.fbx', function (fbx) {
-        const numClones = 10;
-        self.weepingAngels = [];
+		audioLoader.load(
+			this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
+			(buffer) => {
+				this.sound.setBuffer(buffer);
+				this.sound.setLoop(true);
+				this.sound.setVolume(0.3);
+				// Ready to play when user interacts
+			},
+			undefined,
+			(err) => {
+				console.error('An error occurred loading the audio:', err);
+			}
+		);
 
-        for (let i = 0; i < numClones; i++) {
-            const clone = fbx.clone();
-            clone.scale.set(0.01, 0.01, 0.01);
+		// 🧟‍♀️ Load the angels
+		this.loadWeepingAngels();
+	}
 
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 10 + Math.random() * 10;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
+	loadWeepingAngels() {
+		const loader = new FBXLoader().setPath(this.assetsPath);
+		const self = this;
 
-            clone.position.set(
-                self.dolly.position.x + x,
-                0,
-                self.dolly.position.z + z
-            );
+		loader.load(
+			'weepingangel.fbx',
+			function (fbx) {
+				const numClones = 10;
+				self.weepingAngels = [];
 
-            self.scene.add(clone);
+				for (let i = 0; i < numClones; i++) {
+					const clone = fbx.clone();
+					clone.scale.set(0.01, 0.01, 0.01);
 
-            const mixer = new THREE.AnimationMixer(clone);
-            if (fbx.animations && fbx.animations.length > 0) {
-                const action = mixer.clipAction(fbx.animations[0]);
-                action.play();
-            }
+					const angle = Math.random() * Math.PI * 2;
+					const radius = 10 + Math.random() * 10;
+					const x = Math.cos(angle) * radius;
+					const z = Math.sin(angle) * radius;
 
-            self.weepingAngels.push({ object: clone, mixer });
-        }
+					clone.position.set(
+						self.dolly.position.x + x,
+						0,
+						self.dolly.position.z + z
+					);
 
-    }, undefined, function (error) {
-        console.error('Error loading weepingangel.fbx:', error);
-    });
+					self.scene.add(clone);
+
+					const mixer = new THREE.AnimationMixer(clone);
+					if (fbx.animations && fbx.animations.length > 0) {
+						const action = mixer.clipAction(fbx.animations[0]);
+						action.play();
+					}
+
+					self.weepingAngels.push({ object: clone, mixer });
+				}
+			},
+			undefined,
+			function (error) {
+				console.error('Error loading weepingangel.fbx:', error);
+			}
+		);
+	}
 }
 
 this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
