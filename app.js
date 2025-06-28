@@ -175,6 +175,7 @@ setEnvironment() {
     }, undefined, function(err) {
         console.error('An error occurred loading the skybox:', err);
     });
+	}
 }
 
     
