@@ -416,8 +416,11 @@ loader.load(
             // Smooth movement toward target
             cat.position.lerp(targetPos, 0.02); // 0.02 = follow speed
 
-            // Optional: make cat face the player
-            cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
+            // ✨ Add spin animation
+            cat.rotation.y += 0.05;
+
+            // Optional: face player (but might conflict with spin)
+            // cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
         }
     });
 }
