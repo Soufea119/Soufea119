@@ -81,30 +81,18 @@ class App{
             });
 	}
 	
-   setEnvironment() {
-    const loader = new RGBELoader().setDataType(THREE.UnsignedByteType);
-    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-    pmremGenerator.compileEquirectangularShader();
-
+setEnvironment() {
+    const loader = new THREE.TextureLoader();
     const self = this;
 
-    loader.load('./assets/hdr/moonless_golf_2k.hdr', (texture) => {
-        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-
-        self.scene.environment = envMap;
-self.scene.background = texture;
-self.originalEnvMap = envMap;
-self.originalBG = texture;
-
-
-        pmremGenerator.dispose();
-    },
-    undefined,
-    (err) => {
-        console.error('An error occurred setting the environment');
+    loader.load('./assets/skybox.jpg', function(texture) {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        self.scene.background = texture;
+        self.scene.environment = null; // No HDR lighting
+    }, undefined, function(err) {
+        console.error('An error occurred loading the skybox:', err);
     });
 }
-
 
     
     resize(){
@@ -430,7 +418,7 @@ loader.load(
                     });
                     if (!boardFound){
                         this.boardShown = "";
-                        this.ui.visible = false;
+                        this.ui.visible = false; 
                     }
                 }
             }
