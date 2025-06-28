@@ -1,5 +1,4 @@
 import * as THREE from './libs/three/three.module.js';
-
 import { GLTFLoader } from './libs/three/jsm/GLTFLoader.js';
 import { DRACOLoader } from './libs/three/jsm/DRACOLoader.js';
 import { RGBELoader } from './libs/three/jsm/RGBELoader.js';
@@ -9,33 +8,8 @@ import { VRButton } from './libs/VRButton.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js'
 import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
-import { EffectComposer } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/postprocessing/ShaderPass.js';
 
-const TintShader = {
-    uniforms: {
-        tDiffuse: { value: null },
-        tint: { value: new THREE.Vector3(0.05, 0.2, 0.05) } // greenish tint
-    },
-    vertexShader: `
-        varying vec2 vUv;
-        void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-    `,
-    fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform vec3 tint;
-        varying vec2 vUv;
-        void main() {
-            vec4 color = texture2D(tDiffuse, vUv);
-            color.rgb += tint;
-            gl_FragColor = color;
-        } 
-    `
-};
+
 
 
 
@@ -98,12 +72,7 @@ audioLoader.load(
 
 
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		// Setup postprocessing
-               this.composer = new EffectComposer(this.renderer);
-               this.composer.addPass(new RenderPass(this.scene, this.camera));
 
-               const tintPass = new ShaderPass(TintShader);
-               this.composer.addPass(tintPass);
 
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
