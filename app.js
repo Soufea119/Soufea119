@@ -9,6 +9,35 @@ import { VRButton } from './libs/VRButton.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js'
 import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
+import { EffectComposer } from './libs/three/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from './libs/three/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from './libs/three/jsm/postprocessing/ShaderPass.js';
+
+const TintShader = {
+    uniforms: {
+        tDiffuse: { value: null },
+        tint: { value: new THREE.Vector3(0.05, 0.2, 0.05) } // greenish tint
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec3 tint;
+        varying vec2 vUv;
+        void main() {
+            vec4 color = texture2D(tDiffuse, vUv);
+            color.rgb += tint;
+            gl_FragColor = color;
+        }
+    `
+};
+
+
 
 class App{
 	constructor(){
@@ -68,6 +97,13 @@ class App{
 
 
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
+		// Setup postprocessing
+               this.composer = new EffectComposer(this.renderer);
+               this.composer.addPass(new RenderPass(this.scene, this.camera));
+
+               const tintPass = new ShaderPass(TintShader);
+               this.composer.addPass(tintPass);
+
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -451,7 +487,9 @@ loader.load(
         }
         
         this.stats.update();
-		this.renderer.render(this.scene, this.camera);
+		this.composer.render();
+
+
 	}
 }
 
