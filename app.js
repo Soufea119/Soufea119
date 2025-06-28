@@ -165,103 +165,95 @@ class App {
 
 	
 setEnvironment() {
-    const loader = new THREE.TextureLoader();
-    const self = this;
+		const loader = new THREE.TextureLoader();
+		const self = this;
 
-    loader.load('./assets/skybox.jpg', function(texture) {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-        self.scene.background = texture;
-        self.scene.environment = null; // No HDR lighting
-    }, undefined, function(err) {
-        console.error('An error occurred loading the skybox:', err);
-    });
-  }
-}
-
-    
-    resize(){
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize( window.innerWidth, window.innerHeight );  
-    }
-    
-	loadCollege(){
-        
-		const loader = new GLTFLoader( ).setPath(this.assetsPath);
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath( './libs/three/js/draco/' );
-        loader.setDRACOLoader( dracoLoader );
-        
-        const self = this;
-		
-		// Load a glTF resource
 		loader.load(
-			// resource URL
-			'college.glb',
-			// called when the resource is loaded
-			function ( gltf ) {
+			'./assets/skybox.jpg',
+			function (texture) {
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				self.scene.background = texture;
+				self.scene.environment = null; // No HDR lighting
+			},
+			undefined,
+			function (err) {
+				console.error('An error occurred loading the skybox:', err);
+			}
+		);
+	}
 
-                const college = gltf.scene.children[0];
-				self.scene.add( college );
-				
+	resize() {
+		this.camera.aspect = window.innerWidth / window.innerHeight;
+		this.camera.updateProjectionMatrix();
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+
+	loadCollege() {
+		const loader = new GLTFLoader().setPath(this.assetsPath);
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath('./libs/three/js/draco/');
+		loader.setDRACOLoader(dracoLoader);
+
+		const self = this;
+
+		loader.load(
+			'college.glb',
+			function (gltf) {
+				const college = gltf.scene.children[0];
+				self.scene.add(college);
+
 				college.traverse(function (child) {
-    				if (child.isMesh){
-						if (child.name.indexOf("PROXY")!=-1){
+					if (child.isMesh) {
+						if (child.name.indexOf("PROXY") !== -1) {
 							child.material.visible = false;
 							self.proxy = child;
-						}else if (child.material.name.indexOf('Glass')!=-1){
-                            child.material.opacity = 0.1;
-                            child.material.transparent = true;
-                        }else if (child.material.name.indexOf("SkyBox")!=-1){
-                            const mat1 = child.material;
-                            const mat2 = new THREE.MeshBasicMaterial({map: mat1.map});
-                            child.material = mat2;
-                            mat1.dispose();
-                        }
+						} else if (child.material.name.indexOf('Glass') !== -1) {
+							child.material.opacity = 0.1;
+							child.material.transparent = true;
+						} else if (child.material.name.indexOf("SkyBox") !== -1) {
+							const mat1 = child.material;
+							const mat2 = new THREE.MeshBasicMaterial({ map: mat1.map });
+							child.material = mat2;
+							mat1.dispose();
+						}
 					}
 				});
-				
-// Load the cat model
-// Load 4 small, scattered cats
-loader.load(
-    'oiiaioooooiai_cat.glb',
-    function (gltf) {
-        self.cats = [];
 
-        for (let i = 0; i < 4; i++) {
-            const cat = gltf.scene.clone();
-            
-            // Smaller scale
-            cat.scale.set(2, 2, 2);
+				// Load the cat model
+				loader.load(
+					'oiiaioooooiai_cat.glb',
+					function (gltf) {
+						self.cats = [];
 
-            // Random scattered position near the player
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 3 + Math.random() * 2; // 3–5 units away
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = 0;
+						for (let i = 0; i < 4; i++) {
+							const cat = gltf.scene.clone();
+							cat.scale.set(2, 2, 2);
 
-            cat.position.set(x, y, z);
-            cat.visible = false; // Hidden at start
-            self.scene.add(cat);
-            self.cats.push(cat);
-        }
+							const angle = Math.random() * Math.PI * 2;
+							const radius = 3 + Math.random() * 2;
+							const x = Math.cos(angle) * radius;
+							const z = Math.sin(angle) * radius;
 
-        // Randomly show/hide each cat every 4 seconds
-        setInterval(() => {
-            self.cats.forEach(cat => {
-                cat.visible = Math.random() < 0.4; // 40% chance each cat appears
-            });
-        }, 4000);
-    },
-    undefined,
-    function (error) {
-        console.error('An error occurred loading the cat model:', error);
-    });
-}
+							cat.position.set(x, 0, z);
+							cat.visible = false;
+							self.scene.add(cat);
+							self.cats.push(cat);
+						}
 
-				   
-                const door1 = college.getObjectByName("LobbyShop_Door__1_");
+						setInterval(() => {
+							self.cats.forEach(cat => {
+								cat.visible = Math.random() < 0.4;
+							});
+						}, 4000);
+					},
+					undefined,
+					function (error) {
+						console.error('An error occurred loading the cat model:', error);
+					}
+				);
+			}
+		);
+	}              const door1 = college.getObjectByName("LobbyShop_Door__1_");
                 const door2 = college.getObjectByName("LobbyShop_Door__2_");
                 const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
                 const obj = new THREE.Object3D();
