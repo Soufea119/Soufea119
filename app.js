@@ -1,406 +1,13 @@
-import * as THREE from './libs/three/three.module.js';
-import { GLTFLoader } from './libs/three/jsm/GLTFLoader.js';
-import { DRACOLoader } from './libs/three/jsm/DRACOLoader.js';
-import { RGBELoader } from './libs/three/jsm/RGBELoader.js';
-import { Stats } from './libs/stats.module.js';
-import { LoadingBar } from './libs/LoadingBar.js';
-import { VRButton } from './libs/VRButton.js';
-import { CanvasUI } from './libs/CanvasUI.js';
-import { GazeController } from './libs/GazeController.js'
-import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
-
-
-
-
-
-class App {
-	constructor() {
-		const container = document.createElement('div');
-		document.body.appendChild(container);
-
-		this.assetsPath = './assets/';
-		this.clock = new THREE.Clock();
-
-		// Camera and Dolly
-		this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 500);
-		this.camera.position.set(0, 1.6, 0);
-
-		this.dolly = new THREE.Object3D();
-		this.dolly.position.set(0, 0, 10);
-		this.dolly.add(this.camera);
-
-		this.dummyCam = new THREE.Object3D();
-		this.camera.add(this.dummyCam);
-
-		// Scene
-		this.scene = new THREE.Scene();
-		this.scene.fog = new THREE.Fog(0x000000, 2, 20);
-		this.scene.add(this.dolly);
-
-		// Audio
-		this.listener = new THREE.AudioListener();
-		this.camera.add(this.listener);
-		const audioLoader = new THREE.AudioLoader();
-		this.sound = new THREE.Audio(this.listener);
-		audioLoader.load(
-			this.assetsPath + 'Mysterious Place - DarkEerie Music (Creative Commons).mp3',
-			(buffer) => {
-				this.sound.setBuffer(buffer);
-				this.sound.setLoop(true);
-				this.sound.setVolume(0.3);
-			},
-			undefined,
-			(err) => {
-				console.error('An error occurred loading the audio:', err);
-			}
-		);
-
-		// Tint Overlay
-		const tintColor = new THREE.Color(0xccff99);
-		const planeGeometry = new THREE.PlaneGeometry(2, 2);
-		const planeMaterial = new THREE.MeshBasicMaterial({
-			color: tintColor,
-			transparent: true,
-			opacity: 0.1,
-			depthTest: false
-		});
-		this.tintOverlay = new THREE.Mesh(planeGeometry, planeMaterial);
-		this.tintOverlay.material.side = THREE.DoubleSide;
-		this.camera.add(this.tintOverlay);
-		this.tintOverlay.position.z = -0.5;
-
-		// Lights
-		const ambient = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.8);
-		this.scene.add(ambient);
-
-		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
-		this.darkLight.visible = false;
-		this.scene.add(this.darkLight);
-
-		// State
-		this.originalEnvMap = null;
-		this.originalBG = null;
-		this.isDark = false;
-
-		// Renderer
-		this.renderer = new THREE.WebGLRenderer({ antialias: true });
-		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.renderer.outputEncoding = THREE.sRGBEncoding;
-		container.appendChild(this.renderer.domElement);
-
-		this.setEnvironment();
-		window.addEventListener('resize', this.resize.bind(this));
-
-		// Helpers
-		this.up = new THREE.Vector3(0, 1, 0);
-		this.origin = new THREE.Vector3();
-		this.workingVec3 = new THREE.Vector3();
-		this.workingQuaternion = new THREE.Quaternion();
-		this.raycaster = new THREE.Raycaster();
-
-		this.stats = new Stats();
-		container.appendChild(this.stats.dom);
-
-		this.loadingBar = new LoadingBar();
-
-		// Load content
-		this.loadWeepingAngels();
-		this.loadCollege();
-
-		this.immersive = false;
-
-		// Load board data
-		fetch('./college.json')
-			.then(response => response.json())
-			.then(obj => {
-				this.boardShown = '';
-				this.boardData = obj;
-			});
-	}
-
-	setEnvironment() {
-		const loader = new THREE.TextureLoader();
-		const self = this;
-
-		loader.load(
-			'./assets/skybox.jpg',
-			function (texture) {
-				texture.mapping = THREE.EquirectangularReflectionMapping;
-				self.scene.background = texture;
-				self.scene.environment = null;
-			},
-			undefined,
-			function (err) {
-				console.error('An error occurred loading the skybox:', err);
-			}
-		);
-	}
-
-	resize() {
-		this.camera.aspect = window.innerWidth / window.innerHeight;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-	}
-
-	loadWeepingAngels() {
-		const loader = new FBXLoader().setPath(this.assetsPath);
-		const self = this;
-
-		loader.load(
-			'weepingangel.fbx',
-			function (fbx) {
-				const numClones = 10;
-				self.weepingAngels = [];
-
-				for (let i = 0; i < numClones; i++) {
-					const clone = fbx.clone();
-					clone.scale.set(0.01, 0.01, 0.01);
-
-					const angle = Math.random() * Math.PI * 2;
-					const radius = 10 + Math.random() * 10;
-					const x = Math.cos(angle) * radius;
-					const z = Math.sin(angle) * radius;
-
-					clone.position.set(
-						self.dolly.position.x + x,
-						0,
-						self.dolly.position.z + z
-					);
-
-					self.scene.add(clone);
-
-					const mixer = new THREE.AnimationMixer(clone);
-					if (fbx.animations && fbx.animations.length > 0) {
-						const action = mixer.clipAction(fbx.animations[0]);
-						action.play();
-					}
-
-					self.weepingAngels.push({ object: clone, mixer });
-				}
-			},
-			undefined,
-			function (error) {
-				console.error('Error loading weepingangel.fbx:', error);
-			}
-		);
-	}
-
-	loadCollege() {
-		const loader = new GLTFLoader().setPath(this.assetsPath);
-		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath('./libs/three/js/draco/');
-		loader.setDRACOLoader(dracoLoader);
-
-		const self = this;
-
-		loader.load(
-			'college.glb',
-			function (gltf) {
-				const college = gltf.scene.children[0];
-				self.scene.add(college);
-
-				college.traverse(function (child) {
-					if (child.isMesh) {
-						if (child.name.includes("PROXY")) {
-							child.material.visible = false;
-							self.proxy = child;
-						} else if (child.material.name.includes('Glass')) {
-							child.material.opacity = 0.1;
-							child.material.transparent = true;
-						} else if (child.material.name.includes("SkyBox")) {
-							const mat1 = child.material;
-							const mat2 = new THREE.MeshBasicMaterial({ map: mat1.map });
-							child.material = mat2;
-							mat1.dispose();
-						}
-					}
-				});
-
-				// Create central pivot at lobby doors
-				const door1 = college.getObjectByName("LobbyShop_Door__1_");
-				const door2 = college.getObjectByName("LobbyShop_Door__2_");
-				if (door1 && door2) {
-					const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
-					const obj = new THREE.Object3D();
-					obj.name = "LobbyShop";
-					obj.position.copy(pos);
-					college.add(obj);
-				}
-
-				self.loadingBar.visible = false;
-				self.setupXR();
-
-				// Load cats
-				loader.load(
-					'oiiaioooooiai_cat.glb',
-					function (gltf) {
-						self.cats = [];
-
-						for (let i = 0; i < 4; i++) {
-							const cat = gltf.scene.clone();
-							cat.scale.set(2, 2, 2);
-
-							const angle = Math.random() * Math.PI * 2;
-							const radius = 3 + Math.random() * 2;
-							const x = Math.cos(angle) * radius;
-							const z = Math.sin(angle) * radius;
-
-							cat.position.set(x, 0, z);
-							cat.visible = false;
-							self.scene.add(cat);
-							self.cats.push(cat);
-						}
-
-						setInterval(() => {
-							self.cats.forEach(cat => {
-								cat.visible = Math.random() < 0.4;
-							});
-						}, 4000);
-					},
-					undefined,
-					function (error) {
-						console.error('An error occurred loading the cat model:', error);
-					}
-				);
-			},
-			function (xhr) {
-				self.loadingBar.progress = xhr.loaded / xhr.total;
-			},
-			function (error) {
-				console.log('An error happened loading college.glb');
-			}
-		);
-	}
-}
-
-    
-    setupXR(){
-
-	    this.renderer.xr.addEventListener('sessionstart', () => {
-    if (this.sound && this.sound.buffer && !this.sound.isPlaying) {
-        this.sound.play();
-    }
-});
-
-        this.renderer.xr.enabled = true;
-
-        const btn = new VRButton( this.renderer );
-        
-        const self = this;
-        
-        const timeoutId = setTimeout( connectionTimeout, 2000 );
-        
-        function onSelectStart( event ) {
-        
-            this.userData.selectPressed = true;
-        
-        }
-
-        function onSelectEnd( event ) {
-        
-            this.userData.selectPressed = false;
-        
-        }
-        
-        function onConnected( event ){
-            clearTimeout( timeoutId );
-        }
-        
-        function connectionTimeout(){
-            self.useGaze = true;
-            self.gazeController = new GazeController( self.scene, self.dummyCam );
-        }
-        
-        this.controllers = this.buildControllers( this.dolly );
-        
-        this.controllers.forEach( ( controller ) =>{
-            controller.addEventListener( 'selectstart', onSelectStart );
-            controller.addEventListener( 'selectend', onSelectEnd );
-            controller.addEventListener( 'connected', onConnected );
-        });
-        
-        const config = {
-            panelSize: { height: 0.5 },
-            height: 256,
-            name: { fontSize: 50, height: 70 },
-            info: { position:{ top: 70, backgroundColor: "#ccc", fontColor:"#000" } }
-        }
-        const content = {
-            name: "name",
-            info: "info"
-        }
-        
-        this.ui = new CanvasUI( content, config );
-        this.scene.add( this.ui.mesh );
-        
-        this.renderer.setAnimationLoop( this.render.bind(this) );
-    }
-    
-    buildControllers( parent = this.scene ){
-        const controllerModelFactory = new XRControllerModelFactory();
-
-        const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -1 ) ] );
-
-        const line = new THREE.Line( geometry );
-        line.scale.z = 0;
-        
-        const controllers = [];
-        
-        for(let i=0; i<=1; i++){
-            const controller = this.renderer.xr.getController( i );
-            controller.add( line.clone() );
-            controller.userData.selectPressed = false;
-            parent.add( controller );
-            controllers.push( controller );
-            
-            const grip = this.renderer.xr.getControllerGrip( i );
-            grip.add( controllerModelFactory.createControllerModel( grip ) );
-            parent.add( grip );
-        }
-        
-        return controllers;
-    }
-    
-    moveDolly(dt){
-        if (this.proxy === undefined) return;
-        
-        const wallLimit = 1.3;
-        const speed = 2;
-		let pos = this.dolly.position.clone();
-        pos.y += 1;
-        
-		let dir = new THREE.Vector3();
-        //Store original dolly rotation
-        const quaternion = this.dolly.quaternion.clone();
-        //Get rotation for movement from the headset pose
-        this.dolly.quaternion.copy( this.dummyCam.getWorldQuaternion(this.workingQuaternion) );
-		this.dolly.getWorldDirection(dir);
-        dir.negate();
-		this.raycaster.set(pos, dir);
-		
-        let blocked = false;
-		
-		let intersect = this.raycaster.intersectObject(this.proxy);
-        if (intersect.length>0){
-            if (intersect[0].distance < wallLimit) blocked = true;
-        }
-		
-		if (!blocked){
-            this.dolly.translateZ(-dt*speed);
-            pos = this.dolly.getWorldPosition( this.origin );
-		}
-		
-       import * as THREE from './libs/three/three.module.js';
-import { GLTFLoader } from './libs/three/jsm/GLTFLoader.js';
-import { DRACOLoader } from './libs/three/jsm/DRACOLoader.js';
-import { RGBELoader } from './libs/three/jsm/RGBELoader.js';
-import { Stats } from './libs/stats.module.js';
-import { LoadingBar } from './libs/LoadingBar.js';
-import { VRButton } from './libs/VRButton.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js';
-import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
+import { LoadingBar } from './libs/LoadingBar.js';
 
 class App {
     constructor() {
@@ -410,7 +17,6 @@ class App {
         this.assetsPath = './assets/';
         this.clock = new THREE.Clock();
 
-        // Camera & Dolly
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 500);
         this.camera.position.set(0, 1.6, 0);
 
@@ -421,12 +27,10 @@ class App {
         this.dummyCam = new THREE.Object3D();
         this.camera.add(this.dummyCam);
 
-        // Scene
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.Fog(0x000000, 2, 20);
         this.scene.add(this.dolly);
 
-        // Audio
         this.listener = new THREE.AudioListener();
         this.camera.add(this.listener);
         const audioLoader = new THREE.AudioLoader();
@@ -442,7 +46,6 @@ class App {
             (err) => console.error('Audio error:', err)
         );
 
-        // Green Tint Overlay
         const tintColor = new THREE.Color(0xccff99);
         const planeGeometry = new THREE.PlaneGeometry(2, 2);
         const planeMaterial = new THREE.MeshBasicMaterial({
@@ -456,7 +59,6 @@ class App {
         this.tintOverlay.position.z = -0.5;
         this.camera.add(this.tintOverlay);
 
-        // Lighting
         const ambient = new THREE.HemisphereLight(0xFFFFFF, 0xAAAAAA, 0.8);
         this.scene.add(ambient);
 
@@ -468,7 +70,6 @@ class App {
         this.originalBG = null;
         this.isDark = false;
 
-        // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -478,7 +79,6 @@ class App {
         this.setEnvironment();
         window.addEventListener('resize', this.resize.bind(this));
 
-        // Helpers
         this.up = new THREE.Vector3(0, 1, 0);
         this.origin = new THREE.Vector3();
         this.workingVec3 = new THREE.Vector3();
@@ -490,7 +90,6 @@ class App {
 
         this.loadingBar = new LoadingBar();
 
-        // Content Loading
         this.loadWeepingAngels();
         this.loadCollege();
 
@@ -530,12 +129,10 @@ class App {
             for (let i = 0; i < numClones; i++) {
                 const clone = fbx.clone();
                 clone.scale.set(0.01, 0.01, 0.01);
-
                 const angle = Math.random() * Math.PI * 2;
                 const radius = 10 + Math.random() * 10;
                 const x = Math.cos(angle) * radius;
                 const z = Math.sin(angle) * radius;
-
                 clone.position.set(this.dolly.position.x + x, 0, this.dolly.position.z + z);
                 this.scene.add(clone);
 
@@ -578,7 +175,6 @@ class App {
                 }
             });
 
-            // Load Cat
             loader.load('oiiaioooooiai_cat.glb', (catGLTF) => {
                 this.cats = [];
                 for (let i = 0; i < 4; i++) {
@@ -597,7 +193,6 @@ class App {
                 }, 4000);
             });
 
-            // Add invisible object for board detection
             const door1 = college.getObjectByName("LobbyShop_Door__1_");
             const door2 = college.getObjectByName("LobbyShop_Door__2_");
             const pos = door1.position.clone().sub(door2.position).multiplyScalar(0.5).add(door2.position);
@@ -704,28 +299,24 @@ class App {
             pos = this.dolly.getWorldPosition(this.origin);
         }
 
-        // Cast Left
         dir.set(-1, 0, 0).applyMatrix4(this.dolly.matrix).normalize();
         this.raycaster.set(pos, dir);
         intersect = this.raycaster.intersectObject(this.proxy);
         if (intersect.length > 0 && intersect[0].distance < wallLimit)
             this.dolly.translateX(wallLimit - intersect[0].distance);
 
-        // Cast Right
         dir.set(1, 0, 0).applyMatrix4(this.dolly.matrix).normalize();
         this.raycaster.set(pos, dir);
         intersect = this.raycaster.intersectObject(this.proxy);
         if (intersect.length > 0 && intersect[0].distance < wallLimit)
             this.dolly.translateX(intersect[0].distance - wallLimit);
 
-        // Cast Down
         dir.set(0, -1, 0);
         pos.y += 1.5;
         this.raycaster.set(pos, dir);
         intersect = this.raycaster.intersectObject(this.proxy);
         if (intersect.length > 0) this.dolly.position.copy(intersect[0].point);
 
-        // Restore original rotation
         this.dolly.quaternion.copy(quaternion);
     }
 
