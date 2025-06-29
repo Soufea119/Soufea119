@@ -246,6 +246,32 @@ loadCollege() {
         }
     );
 }
+	
+spawnAngels() {
+    const self = this;
+    const loader = new GLTFLoader().setPath(this.assetsPath);
+
+    loader.load('weeping_angel.glb', function (gltf) {
+        const baseAngel = gltf.scene;
+
+        self.angels = [];
+
+        const positions = [
+            new THREE.Vector3(4, 0, -6),
+            new THREE.Vector3(-2, 0, -8),
+            new THREE.Vector3(5, 0, 3)
+        ];
+
+        positions.forEach((pos, index) => {
+            const angel = baseAngel.clone();
+            angel.position.copy(pos);
+            angel.scale.set(1.5, 1.5, 1.5);
+            angel.name = `Angel_${index}`;
+            self.scene.add(angel);
+            self.angels.push(angel);
+        });
+    });
+}
 
     
 setupXR() {
