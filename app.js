@@ -218,7 +218,7 @@ loadCollege() {
     const catSound = new THREE.PositionalAudio(listener);
 
     const audioLoader = new THREE.AudioLoader();
-    audioLoader.load(self.assetsPath + 'cat_sound.mp3', function (buffer) {
+    audioLoader.load(self.assetsPath + 'CatMeow.mp3', function (buffer) {
         catSound.setBuffer(buffer);
         catSound.setRefDistance(5);
         catSound.setLoop(true);
