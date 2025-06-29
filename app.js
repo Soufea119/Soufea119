@@ -165,18 +165,25 @@ loader.load(
     function (gltf) {
         const cat = gltf.scene;
         cat.scale.set(2, 2, 2);
-        cat.position.set(0, 0, -3);
+        cat.position.set(0, 0, 0); // Don't offset in the wrapper
         cat.visible = true;
-        self.scene.add(cat);
 
+        // Create wrapper object for positioning + rotation
+        const wrapper = new THREE.Object3D();
+        wrapper.position.set(0, 0, -3); // Initial position
+        wrapper.add(cat);
+        self.scene.add(wrapper);
+
+        // Store both wrapper and cat
         if (!self.cats) self.cats = [];
-        self.cats.push(cat);
+        self.cats.push({ wrapper, cat });
     },
     undefined,
     function (error) {
         console.error('An error occurred loading the cat model:', error);
     }
 );
+
 
 
             // Load the Weeping Angels model
@@ -398,6 +405,7 @@ loader.load(
             targetPos.y = 0;
             cat.position.lerp(targetPos, 0.02);
             cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
+	    cat.rotation.y += 0.1; // Adjust speed as needed
         }
     });
 }
