@@ -73,6 +73,25 @@ audioLoader.load(
     }
 );
 
+		spawnAngels() {
+    const loader = new GLTFLoader();
+    loader.load(this.assetsPath + 'angel.glb', (gltf) => {
+        for (let i = 0; i < 20; i++) {
+            const angel = gltf.scene.clone();
+            const range = 30;
+
+            angel.position.set(
+                (Math.random() - 0.5) * range,
+                0,
+                (Math.random() - 0.5) * range
+            );
+
+            angel.name = angel_${i};
+            this.scene.add(angel);
+            this.angels.push(angel);
+        }
+    });
+}
 		
                 this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
 
@@ -81,28 +100,6 @@ audioLoader.load(
 		this.angels = [];
                 this.spawnAngels(); // 👼 Spawn Weeping Angels
 
-	}
-
-	// 🧩 METHOD NEEDS TO BE INSIDE THE CLASS
-	spawnAngels() {
-		const loader = new GLTFLoader();
-		loader.load(this.assetsPath + 'angel.glb', (gltf) => {
-			for (let i = 0; i < 20; i++) {
-				const angel = gltf.scene.clone();
-				const range = 30;
-
-				angel.position.set(
-					(Math.random() - 0.5) * range,
-					0,
-					(Math.random() - 0.5) * range
-				);
-
-				angel.name = `angel_${i}`;
-				this.scene.add(angel);
-				this.angels.push(angel);
-     });
-	}
-	
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
                 this.darkLight.visible = false;
@@ -127,7 +124,6 @@ audioLoader.load(
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		this.renderer.outputEncoding = THREE.sRGBEncoding;
 		container.appendChild( this.renderer.domElement );
-
         this.setEnvironment();
 	
         window.addEventListener( 'resize', this.resize.bind(this) );
