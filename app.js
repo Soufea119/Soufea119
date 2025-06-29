@@ -199,24 +199,38 @@ loadCollege() {
                 }
             });
 
-            // Load the cat model
+          // Load the cat model
 loader.load(
     'oiiaioooooiai_cat.glb',
     function (gltf) {
         const cat = gltf.scene;
         cat.scale.set(2, 2, 2);
-        cat.position.set(0, 0, 0); // Don't offset in the wrapper
+        cat.position.set(0, 0, 0);
         cat.visible = true;
 
-        // Create wrapper object for positioning + rotation
+        // Create wrapper for positioning
         const wrapper = new THREE.Object3D();
-        wrapper.position.set(0, 0, -3); // Initial position
+        wrapper.position.set(0, 0, -3);
         wrapper.add(cat);
         self.scene.add(wrapper);
 
-        // Store both wrapper and cat
+        // 🔊 Add positional sound to the wrapper
+        const sound = new THREE.PositionalAudio(self.listener); // Already declared in your App
+        const audioLoader = new THREE.AudioLoader();
+
+        audioLoader.load(self.assetsPath + 'cat_sound.mp3', function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setRefDistance(5); // How far the sound can be heard clearly
+            sound.setLoop(true);     // Loop or not
+            sound.setVolume(0.5);    // Adjust as needed
+            sound.play();            // Play immediately
+        });
+
+        wrapper.add(sound); // Attach sound to cat wrapper
+
+        // Store for future use
         if (!self.cats) self.cats = [];
-        self.cats.push({ wrapper, cat });
+        self.cats.push({ wrapper, cat, sound }); // Save sound too if needed
     },
     undefined,
     function (error) {
