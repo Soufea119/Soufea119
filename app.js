@@ -218,7 +218,7 @@ loader.load(
         const sound = new THREE.PositionalAudio(self.listener); // Already declared in your App
         const audioLoader = new THREE.AudioLoader();
 
-        audioLoader.load(self.assetsPath + 'cat_sound.mp3', function (buffer) {
+        audioLoader.load(self.assetsPath + 'CatMeow.mp3', function (buffer) {
             sound.setBuffer(buffer);
             sound.setRefDistance(5); // How far the sound can be heard clearly
             sound.setLoop(true);     // Loop or not
