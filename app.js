@@ -73,9 +73,33 @@ audioLoader.load(
     }
 );
 
+		spawnAngels() {
+    const loader = new GLTFLoader();
+    loader.load(this.assetsPath + 'angel.glb', (gltf) => {
+        for (let i = 0; i < 20; i++) {
+            const angel = gltf.scene.clone();
+            const range = 30;
+
+            angel.position.set(
+                (Math.random() - 0.5) * range,
+                0,
+                (Math.random() - 0.5) * range
+            );
+
+            angel.name = `angel_${i}`;
+            this.scene.add(angel);
+            this.angels.push(angel);
+        }
+    });
+}
+		
                 this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
 
                 this.scene.add( this.dolly );
+
+		this.angels = [];
+                this.spawnAngels(); // 👼 Spawn Weeping Angels
+
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
                 this.darkLight.visible = false;
@@ -436,6 +460,14 @@ render(timestamp, frame) {
         wrapper.lookAt(playerPos.x, 0, playerPos.z);
 
         cat.rotation.y += 0.05;
+    });
+}
+
+	if (this.angels && this.angels.length > 0) {
+    const playerPos = this.dolly.position.clone();
+
+    this.angels.forEach(angel => {
+        angel.lookAt(playerPos);
     });
 }
 
