@@ -72,26 +72,6 @@ audioLoader.load(
         console.error('An error occurred loading the audio:', err);
     }
 );
-		spawnAngels() {
-		const loader = new GLTFLoader();
-		loader.load(this.assetsPath + 'angel.glb', (gltf) => {
-			for (let i = 0; i < 20; i++) {
-				const angel = gltf.scene.clone();
-				const range = 30;
-
-				angel.position.set(
-					(Math.random() - 0.5) * range,
-					0,
-					(Math.random() - 0.5) * range
-				);
-
-				angel.name = `angel_${i}`;
-				this.scene.add(angel);
-				this.angels.push(angel);
-			}
-		});
-	}
-}
 		
 		
                 this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
@@ -438,6 +418,26 @@ loader.load(
         this.ui.visible = true;
         this.boardShown = name;
     }
+
+spawnAngels() {
+		const loader = new GLTFLoader();
+		loader.load(this.assetsPath + 'angel.glb', (gltf) => {
+			for (let i = 0; i < 20; i++) {
+				const angel = gltf.scene.clone();
+				const range = 30;
+
+				angel.position.set(
+					(Math.random() - 0.5) * range,
+					0,
+					(Math.random() - 0.5) * range
+				);
+
+				angel.name = `angel_${i}`;
+				this.scene.add(angel);
+				this.angels.push(angel);
+			}
+		});
+	}
 
 render(timestamp, frame) {
     const dt = this.clock.getDelta();
