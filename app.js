@@ -258,30 +258,32 @@ spawnAngels() {
         self.angels = [];
 
         const numAngels = 5;
-        const radius = 4; // distance from player
+        const radius = 4; // Distance from player
         const center = self.dolly.position.clone();
+        const angelHeight = 1.0; // How high above the ground the angels spawn
 
         for (let i = 0; i < numAngels; i++) {
             const angle = (i / numAngels) * Math.PI * 2;
 
             const x = center.x + radius * Math.cos(angle);
             const z = center.z + radius * Math.sin(angle);
-            const y = center.y;
+            const y = center.y + angelHeight;
 
             const angel = baseAngel.clone();
             angel.position.set(x, y, z);
-            angel.scale.set(3, 3, 3); // adjust as needed
+            angel.scale.set(3, 3, 3); // Make bigger if needed
             angel.name = `Angel_${i}`;
 
-            // Face the player (look at dolly)
-            angel.lookAt(center);
+            // Make angel face the player’s eye level
+            const target = center.clone();
+            target.y += 1.5; // Eye-level target (optional)
+            angel.lookAt(target);
 
             self.scene.add(angel);
             self.angels.push(angel);
         }
     });
 }
-
 
     
 setupXR() {
