@@ -9,6 +9,28 @@ import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js'
 import { XRControllerModelFactory } from './libs/three/jsm/XRControllerModelFactory.js';
 
+class BloodDrip {
+    constructor(texture, startPos, scene) {
+        const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        this.sprite = new THREE.Sprite(material);
+        this.sprite.scale.set(0.15, 0.15, 1); // Blood drop size
+        this.sprite.position.copy(startPos);
+        this.speed = 0.02 + Math.random() * 0.01; // Slightly random fall speed
+        this.lifetime = 4; // seconds
+        scene.add(this.sprite);
+        this.scene = scene;
+    }
+
+    update(dt) {
+        this.sprite.position.y -= this.speed;
+        this.lifetime -= dt;
+        if (this.lifetime < 0) {
+            this.scene.remove(this.sprite);
+            return false; // Remove from array
+        }
+        return true;
+    }
+}
 
 
 
@@ -417,7 +439,16 @@ render(timestamp, frame) {
     });
 }
 
-
+// 🩸 Animate blood drips
+if (this.bloodDrips && this.bloodDrips.length > 0) {
+    this.bloodDrips.forEach((drip, index) => {
+        drip.mesh.position.y -= 0.01; // Fall speed
+        if (drip.mesh.position.y < 0) {
+            this.scene.remove(drip.mesh);
+            this.bloodDrips.splice(index, 1); // Remove from list
+        }
+    });
+}
 
 
 
