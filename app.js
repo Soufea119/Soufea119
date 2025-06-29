@@ -254,7 +254,12 @@ spawnAngels() {
     loader.load('WeepingAngels2.glb', function (gltf) {
         const baseAngel = gltf.scene;
 
-        self.angels = [];
+        // Optional scale if needed
+        baseAngel.scale.set(1.5, 1.5, 1.5);
+        baseAngel.visible = true;
+
+        // Array to hold all angel wrappers
+        if (!self.angels) self.angels = [];
 
         const positions = [
             new THREE.Vector3(4, 0, -6),
@@ -263,12 +268,15 @@ spawnAngels() {
         ];
 
         positions.forEach((pos, index) => {
-            const angel = baseAngel.clone();
-            angel.position.copy(pos);
-            angel.scale.set(1.5, 1.5, 1.5);
-            angel.name = `Angel_${index}`;
-            self.scene.add(angel);
-            self.angels.push(angel);
+            const wrapper = new THREE.Object3D();
+            wrapper.position.copy(pos);
+
+            const angelClone = baseAngel.clone(true);
+            angelClone.name = `Angel_${index}`;
+            wrapper.add(angelClone);
+
+            self.scene.add(wrapper);
+            self.angels.push({ wrapper, angel: angelClone });
         });
     });
 }
