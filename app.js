@@ -281,70 +281,72 @@ loadCollege() {
 }
 
     
-    setupXR(){
+setupXR() {
+    this.renderer.xr.addEventListener('sessionstart', () => {
+        // Background sound
+        if (this.sound && this.sound.buffer && !this.sound.isPlaying) {
+            this.sound.play();
+        }
 
-	    this.renderer.xr.addEventListener('sessionstart', () => {
-    if (this.sound && this.sound.buffer && !this.sound.isPlaying) {
-        this.sound.play();
+        // 🐱 Cat sound (looped)
+        if (this.catSound && this.catSound.buffer && !this.catSound.isPlaying) {
+            this.catSound.play();
+        }
+
+        this.startDrippingBlood = true;
+        this.lastDripTime = performance.now();
+    });
+
+    this.renderer.xr.enabled = true;
+
+    const btn = new VRButton(this.renderer);
+
+    const self = this;
+
+    const timeoutId = setTimeout(connectionTimeout, 2000);
+
+    function onSelectStart(event) {
+        this.userData.selectPressed = true;
     }
-		     this.startDrippingBlood = true;
-    this.lastDripTime = performance.now();
-});
 
-        this.renderer.xr.enabled = true;
-
-        const btn = new VRButton( this.renderer );
-        
-        const self = this;
-        
-        const timeoutId = setTimeout( connectionTimeout, 2000 );
-        
-        function onSelectStart( event ) {
-        
-            this.userData.selectPressed = true;
-        
-        }
-
-        function onSelectEnd( event ) {
-        
-            this.userData.selectPressed = false;
-        
-        }
-        
-        function onConnected( event ){
-            clearTimeout( timeoutId );
-        }
-        
-        function connectionTimeout(){
-            self.useGaze = true;
-            self.gazeController = new GazeController( self.scene, self.dummyCam );
-        }
-        
-        this.controllers = this.buildControllers( this.dolly );
-        
-        this.controllers.forEach( ( controller ) =>{
-            controller.addEventListener( 'selectstart', onSelectStart );
-            controller.addEventListener( 'selectend', onSelectEnd );
-            controller.addEventListener( 'connected', onConnected );
-        });
-        
-        const config = {
-            panelSize: { height: 0.5 },
-            height: 256,
-            name: { fontSize: 50, height: 70 },
-            info: { position:{ top: 70, backgroundColor: "#ccc", fontColor:"#000" } }
-        }
-        const content = {
-            name: "name",
-            info: "info"
-        }
-        
-        this.ui = new CanvasUI( content, config );
-        this.scene.add( this.ui.mesh );
-        
-        this.renderer.setAnimationLoop( this.render.bind(this) );
+    function onSelectEnd(event) {
+        this.userData.selectPressed = false;
     }
-    
+
+    function onConnected(event) {
+        clearTimeout(timeoutId);
+    }
+
+    function connectionTimeout() {
+        self.useGaze = true;
+        self.gazeController = new GazeController(self.scene, self.dummyCam);
+    }
+
+    this.controllers = this.buildControllers(this.dolly);
+
+    this.controllers.forEach((controller) => {
+        controller.addEventListener('selectstart', onSelectStart);
+        controller.addEventListener('selectend', onSelectEnd);
+        controller.addEventListener('connected', onConnected);
+    });
+
+    const config = {
+        panelSize: { height: 0.5 },
+        height: 256,
+        name: { fontSize: 50, height: 70 },
+        info: { position: { top: 70, backgroundColor: "#ccc", fontColor: "#000" } }
+    };
+    const content = {
+        name: "name",
+        info: "info"
+    };
+
+    this.ui = new CanvasUI(content, config);
+    this.scene.add(this.ui.mesh);
+
+    this.renderer.setAnimationLoop(this.render.bind(this));
+}
+
     buildControllers( parent = this.scene ){
         const controllerModelFactory = new XRControllerModelFactory();
 
