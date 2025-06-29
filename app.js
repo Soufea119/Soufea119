@@ -394,24 +394,26 @@ loader.load(
 render(timestamp, frame) {
     const dt = this.clock.getDelta();
 
-    if (this.cats && this.cats.length > 0) {
-        const playerPos = this.dolly.position.clone();
-        const behindDir = new THREE.Vector3(0, 0, 1).applyQuaternion(this.dummyCam.quaternion).normalize();
+  if (this.cats && this.cats.length > 0) {
+    const playerPos = this.dolly.position.clone();
+    const time = performance.now() * 0.001;
 
-        this.cats.forEach((entry, i) => {
-            const { wrapper, cat } = entry;
+    this.cats.forEach((entry, i) => {
+        const { wrapper, cat } = entry;
 
-            const offset = 1.5 + i * 1.5;
-            const targetPos = playerPos.clone().addScaledVector(behindDir, offset);
-            targetPos.y = 0;
+        const radius = 2.5 + i * 0.5;
+        const angle = time + i;
 
-            wrapper.position.lerp(targetPos, 0.02);
-            wrapper.lookAt(playerPos.x, wrapper.position.y, playerPos.z);
+        const x = playerPos.x + radius * Math.cos(angle);
+        const z = playerPos.z + radius * Math.sin(angle);
 
-            // Spin the cat within the wrapper
-            cat.rotation.y += 0.1;
-        });
-    }
+        wrapper.position.set(x, 0, z);
+        wrapper.lookAt(playerPos.x, 0, playerPos.z);
+
+        cat.rotation.y += 0.05;
+    });
+}
+
 
 
 
