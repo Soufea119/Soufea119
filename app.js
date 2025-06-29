@@ -165,37 +165,22 @@ setEnvironment() {
 				});
 				
 // Load the cat model
-// Load 4 small, scattered cats
 loader.load(
     'oiiaioooooiai_cat.glb',
     function (gltf) {
-        self.cats = [];
+        const cat = gltf.scene;
 
-        for (let i = 0; i < 4; i++) {
-            const cat = gltf.scene.clone();
-            
-            // Smaller scale
-            cat.scale.set(2, 2, 2);
+        // Scale down
+        cat.scale.set(2, 2, 2);
 
-            // Random scattered position near the player
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 3 + Math.random() * 2; // 3–5 units away
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = 0;
+        // Start behind player
+        cat.position.set(0, 0, -3);
 
-            cat.position.set(x, y, z);
-            cat.visible = false; // Hidden at start
-            self.scene.add(cat);
-            self.cats.push(cat);
-        }
+        // Make visible
+        cat.visible = true;
 
-        // Randomly show/hide each cat every 4 seconds
-        setInterval(() => {
-            self.cats.forEach(cat => {
-                cat.visible = Math.random() < 0.4; // 40% chance each cat appears
-            });
-        }, 4000);
+        self.scene.add(cat);
+        self.cat = cat; // Store reference for use in render()
     },
     undefined,
     function (error) {
