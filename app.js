@@ -394,25 +394,29 @@ loader.load(
 render(timestamp, frame) {
     const dt = this.clock.getDelta();
 
-  if (this.cats && this.cats.length > 0) {
+ if (this.cats && this.cats.length > 0) {
     const playerPos = this.dolly.position.clone();
     const time = performance.now() * 0.001;
 
     this.cats.forEach((entry, i) => {
         const { wrapper, cat } = entry;
 
-        const radius = 2.5 + i * 1.5;
-        const angle = time + i;
+        const radius = 4 + i * 1.5;
+        const angle = time + i * 0.5;
 
         const x = playerPos.x + radius * Math.cos(angle);
         const z = playerPos.z + radius * Math.sin(angle);
 
-        wrapper.position.set(x, 0, z);
+        // 🟡 Bounce height using sine wave
+        const bounceY = Math.abs(Math.sin(time * 2 + i)) * 0.5 + 0.5;
+
+        wrapper.position.set(x, bounceY, z);
         wrapper.lookAt(playerPos.x, 0, playerPos.z);
 
         cat.rotation.y += 0.05;
     });
 }
+
 
 
 
