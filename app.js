@@ -1,10 +1,10 @@
 import * as THREE from './libs/three/three.module.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
+import { GLTFLoader } from './libs/three/examples/jsm/loaders/GLTFLoader.js';
+import { FBXLoader } from './libs/three/examples/jsm/loaders/FBXLoader.js';
+import { DRACOLoader } from './libs/three/examples/jsm/loaders/DRACOLoader.js';
+import { VRButton } from './libs/three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from './libs/three/examples/jsm/webxr/XRControllerModelFactory.js';
+import Stats from './libs/three/examples/jsm/libs/stats.module.js';
 import { CanvasUI } from './libs/CanvasUI.js';
 import { GazeController } from './libs/GazeController.js';
 import { LoadingBar } from './libs/LoadingBar.js';
