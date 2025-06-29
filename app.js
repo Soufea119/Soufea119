@@ -388,7 +388,7 @@ loader.load(
 
 	if (this.cats && this.cats.length > 0) {
     const playerPos = this.dolly.position.clone();
-    const behindDir = new THREE.Vector3(0, 0, 1); // Direction behind the player
+    const behindDir = new THREE.Vector3(0, 0, 1);
     behindDir.applyQuaternion(this.dummyCam.quaternion).normalize();
 
     this.cats.forEach((cat, i) => {
@@ -401,6 +401,7 @@ loader.load(
         }
     });
 }
+
 
 
 
