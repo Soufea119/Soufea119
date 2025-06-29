@@ -78,9 +78,6 @@ audioLoader.load(
 
                 this.scene.add( this.dolly );
 
-		this.angels = [];
-                this.spawnAngels(); // 👼 Spawn Weeping Angels
-
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
                 this.darkLight.visible = false;
@@ -228,37 +225,7 @@ loadCollege() {
         self.catSound = catSound; // Store for later play
     });
 });
-
-
-
-
- loader.load(
-    'WeepingAngels.glb',
-    function (gltf) {
-        const basePosition = self.dolly.position.clone(); // Player spawn
-        self.angels = []; // Clear previous angels
-
-        const angel = gltf.scene.clone(true);
-        angel.scale.set(1, 1, 1); // Scale 1 = default
-
-        // Place slightly in front of player
-        angel.position.set(
-            basePosition.x,
-            basePosition.y,
-            basePosition.z - 2
-        );
-
-        self.scene.add(angel);
-        self.angels.push(angel);
-    },
-    undefined,
-    function (error) {
-        console.error('Error loading Weeping Angels model:', error);
-    }
-);
-
-
-
+		
             // Setup door midpoint object
             const door1 = college.getObjectByName("LobbyShop_Door__1_");
             const door2 = college.getObjectByName("LobbyShop_Door__2_");
@@ -452,26 +419,6 @@ setupXR() {
         this.boardShown = name;
     }
 
-spawnAngels() {
-		const loader = new GLTFLoader();
-		loader.load(this.assetsPath + 'WeepingAngels.glb', (gltf) => {
-			for (let i = 0; i < 20; i++) {
-				const angel = gltf.scene.clone();
-				const range = 30;
-
-				angel.position.set(
-					(Math.random() - 0.5) * range,
-					0,
-					(Math.random() - 0.5) * range
-				);
-
-				angel.name = `angel_${i}`;
-				this.scene.add(angel);
-				this.angels.push(angel);
-			}
-		});
-	}
-
 render(timestamp, frame) {
     const dt = this.clock.getDelta();
 
@@ -498,14 +445,7 @@ render(timestamp, frame) {
     });
 }
 
-	if (this.angels && this.angels.length > 0) {
-    const playerPos = this.dolly.position.clone();
-
-    this.angels.forEach(angel => {
-        angel.lookAt(playerPos);
-    });
-}
-
+	
 if (this.startDrippingBlood && this.bloodTexture) {
     const now = performance.now();
 
