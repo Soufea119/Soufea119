@@ -83,25 +83,26 @@ audioLoader.load(
 
 	}
 
-		spawnAngels() {
-    const loader = new GLTFLoader();
-    loader.load(this.assetsPath + 'angel.glb', (gltf) => {
-        for (let i = 0; i < 20; i++) {
-            const angel = gltf.scene.clone();
-            const range = 30;
+	// 🧩 METHOD NEEDS TO BE INSIDE THE CLASS
+	spawnAngels() {
+		const loader = new GLTFLoader();
+		loader.load(this.assetsPath + 'angel.glb', (gltf) => {
+			for (let i = 0; i < 20; i++) {
+				const angel = gltf.scene.clone();
+				const range = 30;
 
-            angel.position.set(
-                (Math.random() - 0.5) * range,
-                0,
-                (Math.random() - 0.5) * range
-            );
+				angel.position.set(
+					(Math.random() - 0.5) * range,
+					0,
+					(Math.random() - 0.5) * range
+				);
 
-            angel.name = `angel_${i}`;
-            this.scene.add(angel);
-            this.angels.push(angel);
-	   }
-        }
-    });
+				angel.name = `angel_${i}`;
+				this.scene.add(angel);
+				this.angels.push(angel);
+			}
+		});
+	}
 }
 
 
