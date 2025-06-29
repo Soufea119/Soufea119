@@ -542,6 +542,17 @@ if (this.startDrippingBlood && this.bloodTexture) {
             this.resize();
             this.immersive = this.renderer.xr.isPresenting;
         }
+
+	// 🔁 Make angels face the player
+if (this.angels && this.angels.length > 0) {
+    const playerPos = this.dolly.position.clone();
+    playerPos.y += 1.5; // Eye level
+
+    this.angels.forEach((angel) => {
+        angel.lookAt(playerPos);
+    });
+}
+
         
         this.stats.update();
 		this.renderer.render(this.scene, this.camera);
