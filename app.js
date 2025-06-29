@@ -73,6 +73,14 @@ audioLoader.load(
     }
 );
 
+		
+                this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
+
+                this.scene.add( this.dolly );
+
+		this.angels = [];
+                this.spawnAngels(); // 👼 Spawn Weeping Angels
+
 		spawnAngels() {
     const loader = new GLTFLoader();
     loader.load(this.assetsPath + 'angel.glb', (gltf) => {
@@ -92,13 +100,6 @@ audioLoader.load(
         }
     });
 }
-		
-                this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
-
-                this.scene.add( this.dolly );
-
-		this.angels = [];
-                this.spawnAngels(); // 👼 Spawn Weeping Angels
 
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
