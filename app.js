@@ -245,7 +245,7 @@ loader.load(
         positions.forEach(pos => {
             const angel = baseAngel.clone(true); // Deep clone
 
-            angel.scale.set(4, 4, 4); // Keep same scale
+            angel.scale.set(1, 1, 1); // Keep same scale
             angel.position.copy(pos);
 
             // Optional: small Y rotation for realism
