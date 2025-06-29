@@ -118,6 +118,18 @@ audioLoader.load(
         this.raycaster = new THREE.Raycaster();
         
         this.stats = new Stats();
+
+		this.bloodDrips = [];
+this.startDrippingBlood = false;
+this.lastDripTime = 0;
+
+// Load blood texture
+const textureLoader = new THREE.TextureLoader();
+textureLoader.load(this.assetsPath + 'blood.png', (texture) => {
+    this.bloodTexture = texture;
+});
+
+
 		container.appendChild( this.stats.dom );
         
 		this.loadingBar = new LoadingBar();
@@ -258,6 +270,8 @@ loader.load(
     if (this.sound && this.sound.buffer && !this.sound.isPlaying) {
         this.sound.play();
     }
+		     this.startDrippingBlood = true;
+    this.lastDripTime = performance.now();
 });
 
         this.renderer.xr.enabled = true;
@@ -473,9 +487,25 @@ render(timestamp, frame) {
     });
 }
 
+// Blood dripping
+if (this.startDrippingBlood && this.bloodTexture) {
+    const now = performance.now();
+    if (now - this.lastDripTime > 300) { // every 300ms
+        const pos = this.dolly.position.clone();
+        pos.x += (Math.random() - 0.5) * 0.2; // slight offset for realism
+        pos.z += (Math.random() - 0.5) * 0.2;
+
+        const blood = new BloodDrip(this.bloodTexture, pos, this.scene);
+        this.bloodDrips.push(blood);
+        this.lastDripTime = now;
+    }
+}
+
+// Update existing drips
 if (this.bloodDrips && this.bloodDrips.length > 0) {
     this.bloodDrips = this.bloodDrips.filter(drip => drip.update(dt));
 }
+
 
 
 
