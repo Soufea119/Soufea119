@@ -186,24 +186,27 @@ loader.load(
     function (error) {
         console.error('An error occurred loading the cat model:', error);
     }
+);
 
-	loader.load(
+// ✅ Separate loader.load for Weeping Angels
+loader.load(
     'WeepingAngels.glb',
     function (gltf) {
         const angels = gltf.scene;
 
         // Optional adjustments
-        angels.scale.set(2, 2, 2); // Adjust based on model size
-        angels.position.set(5, 0, -4); // Adjust where you want it placed
+        angels.scale.set(2, 2, 2);
+        angels.position.set(5, 0, -4);
 
         self.scene.add(angels);
-        self.angels = angels; // Store reference if you want to access/update it later
+        self.angels = angels;
     },
     undefined,
     function (error) {
         console.error('An error occurred loading the Weeping Angels model:', error);
     }
 );
+
 
 );
 
