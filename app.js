@@ -91,6 +91,7 @@ audioLoader.load(
 			}
 		});
 	}
+}
 		
 		
                 this.scene.fog = new THREE.Fog(0x000000, 2, 20); // Closer and darker fog
