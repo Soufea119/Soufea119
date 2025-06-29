@@ -181,7 +181,7 @@ loadCollege() {
                 'WeepingAngels.glb',
                 function (gltf) {
                     const angels = gltf.scene;
-                    angels.scale.set(2, 2, 2);
+                    angels.scale.set(0.5, 0.5, 0.5);
                     angels.position.set(5, 0, -4);
                     self.scene.add(angels);
                     self.angels = angels;
