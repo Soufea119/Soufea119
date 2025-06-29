@@ -455,7 +455,7 @@ loader.load(
 
 spawnAngels() {
 		const loader = new GLTFLoader();
-		loader.load(this.assetsPath + 'angel.glb', (gltf) => {
+		loader.load(this.assetsPath + 'WeepingAngels.glb', (gltf) => {
 			for (let i = 0; i < 20; i++) {
 				const angel = gltf.scene.clone();
 				const range = 30;
@@ -511,7 +511,7 @@ if (this.startDrippingBlood && this.bloodTexture) {
     const now = performance.now();
 
     if (now - this.lastDripTime > 100) { // every 100ms
-	const dripAreaSize = 50; // ⬅️ change this to make the area larger
+	const dripAreaSize = 300; // ⬅️ change this to make the area larger
         const randomX = (Math.random() - 0.5) * 10;
         const randomZ = (Math.random() - 0.5) * 10;
         const startPos = new THREE.Vector3(randomX, 5 + Math.random() * 2, randomZ); // spawn overhead
