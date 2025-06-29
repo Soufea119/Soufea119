@@ -391,26 +391,27 @@ loader.load(
         this.boardShown = name;
     }
 
-	render( timestamp, frame ){
-        const dt = this.clock.getDelta();
+render(timestamp, frame) {
+    const dt = this.clock.getDelta();
 
-	if (this.cats && this.cats.length > 0) {
-    const playerPos = this.dolly.position.clone();
-    const behindDir = new THREE.Vector3(0, 0, 1).applyQuaternion(this.dummyCam.quaternion).normalize();
+    if (this.cats && this.cats.length > 0) {
+        const playerPos = this.dolly.position.clone();
+        const behindDir = new THREE.Vector3(0, 0, 1).applyQuaternion(this.dummyCam.quaternion).normalize();
 
-    this.cats.forEach((cat, i) => {
-        if (cat.visible) {
+        this.cats.forEach((entry, i) => {
+            const { wrapper, cat } = entry;
+
             const offset = 1.5 + i * 1.5;
             const targetPos = playerPos.clone().addScaledVector(behindDir, offset);
             targetPos.y = 0;
-            cat.position.lerp(targetPos, 0.02);
-            cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
-	    cat.rotation.y += 0.1; // Adjust speed as needed
-        }
-    });
-}
 
+            wrapper.position.lerp(targetPos, 0.02);
+            wrapper.lookAt(playerPos.x, wrapper.position.y, playerPos.z);
 
+            // Spin the cat within the wrapper
+            cat.rotation.y += 0.1;
+        });
+    }
 
 
 
