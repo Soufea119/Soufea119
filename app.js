@@ -401,7 +401,7 @@ render(timestamp, frame) {
     this.cats.forEach((entry, i) => {
         const { wrapper, cat } = entry;
 
-        const radius = 2.5 + i * 0.5;
+        const radius = 2.5 + i * 1.5;
         const angle = time + i;
 
         const x = playerPos.x + radius * Math.cos(angle);
