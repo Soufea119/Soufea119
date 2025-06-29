@@ -251,7 +251,7 @@ spawnAngels() {
     const self = this;
     const loader = new GLTFLoader().setPath(this.assetsPath);
 
-    loader.load('weeping_angel.glb', function (gltf) {
+    loader.load('WeepingAngels2.glb', function (gltf) {
         const baseAngel = gltf.scene;
 
         self.angels = [];
