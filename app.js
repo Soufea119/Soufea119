@@ -226,40 +226,41 @@ loader.load(
 
 
 
-         loader.load(
+   loader.load(
     'WeepingAngels.glb',
     function (gltf) {
-        const baseAngel = gltf.scene;
+        const basePosition = self.dolly.position.clone(); // Player spawn
 
-        // Clear existing angels
-        self.angels = [];
+        const angelCount = 3; // How many angels to spawn
+        self.angels = []; // Clear previous angels
 
-        // Define spawn positions (close together)
-        const positions = [
-            new THREE.Vector3(5, 0, -4),
-            new THREE.Vector3(5.5, 0, -4),
-            new THREE.Vector3(4.5, 0, -4),
-            new THREE.Vector3(5, 0, -3.5)
-        ];
+        for (let i = 0; i < angelCount; i++) {
+            const angel = gltf.scene.clone(true); // Deep clone
+            angel.scale.set(4, 4, 4); // Consistent size
 
-        positions.forEach(pos => {
-            const angel = baseAngel.clone(true); // Deep clone
+            // Slight offset around player spawn
+            const offsetX = (i - 1) * 2; // e.g., -2, 0, 2
+            const offsetZ = -2; // Slightly behind player
 
-            angel.scale.set(1, 1, 1); // Keep same scale
-            angel.position.copy(pos);
+            angel.position.set(
+                basePosition.x + offsetX,
+                basePosition.y,
+                basePosition.z + offsetZ
+            );
 
-            // Optional: small Y rotation for realism
+            // Optional: rotate randomly for variety
             angel.rotation.y = Math.random() * Math.PI * 2;
 
             self.scene.add(angel);
             self.angels.push(angel);
-        });
+        }
     },
     undefined,
     function (error) {
         console.error('Error loading Weeping Angels model:', error);
     }
 );
+
 
             // Setup door midpoint object
             const door1 = college.getObjectByName("LobbyShop_Door__1_");
