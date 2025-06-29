@@ -487,25 +487,22 @@ render(timestamp, frame) {
     });
 }
 
-// Blood dripping
 if (this.startDrippingBlood && this.bloodTexture) {
     const now = performance.now();
-    if (now - this.lastDripTime > 300) { // every 300ms
-        const pos = this.dolly.position.clone();
-        pos.x += (Math.random() - 0.5) * 0.2; // slight offset for realism
-        pos.z += (Math.random() - 0.5) * 0.2;
 
-        const blood = new BloodDrip(this.bloodTexture, pos, this.scene);
-        this.bloodDrips.push(blood);
+    if (now - this.lastDripTime > 100) { // every 100ms
+        const randomX = (Math.random() - 0.5) * 10;
+        const randomZ = (Math.random() - 0.5) * 10;
+        const startPos = new THREE.Vector3(randomX, 5 + Math.random() * 2, randomZ); // spawn overhead
+
+        const drip = new BloodDrip(this.bloodTexture, startPos, this.scene);
+        this.bloodDrips.push(drip);
         this.lastDripTime = now;
     }
-}
 
-// Update existing drips
-if (this.bloodDrips && this.bloodDrips.length > 0) {
+    // Update existing drips
     this.bloodDrips = this.bloodDrips.filter(drip => drip.update(dt));
 }
-
 
 
 
