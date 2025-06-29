@@ -255,34 +255,33 @@ spawnAngels() {
 
     loader.load('WeepingAngels2.glb', function (gltf) {
         const baseAngel = gltf.scene;
+        self.angels = [];
 
-        // Optional scale if needed
-        baseAngel.scale.set(1.5, 1.5, 1.5);
-        baseAngel.visible = true;
+        const numAngels = 5;
+        const radius = 4; // distance from player
+        const center = self.dolly.position.clone();
 
-        // Array to hold all angel wrappers
-        if (!self.angels) self.angels = [];
+        for (let i = 0; i < numAngels; i++) {
+            const angle = (i / numAngels) * Math.PI * 2;
 
-        const positions = [
-            new THREE.Vector3(4, 0, -6),
-            new THREE.Vector3(-2, 0, -8),
-            new THREE.Vector3(5, 0, 3)
-        ];
+            const x = center.x + radius * Math.cos(angle);
+            const z = center.z + radius * Math.sin(angle);
+            const y = center.y;
 
-        positions.forEach((pos, index) => {
-            const wrapper = new THREE.Object3D();
-            wrapper.position.copy(pos);
+            const angel = baseAngel.clone();
+            angel.position.set(x, y, z);
+            angel.scale.set(3, 3, 3); // adjust as needed
+            angel.name = `Angel_${i}`;
 
-            const angelClone = baseAngel.clone(true);
-	    angelClone.scale.set(6, 6, 6); // Bigger angels here
-            angelClone.name = `Angel_${index}`;
-            wrapper.add(angelClone);
+            // Face the player (look at dolly)
+            angel.lookAt(center);
 
-            self.scene.add(wrapper);
-            self.angels.push({ wrapper, angel: angelClone });
-        });
+            self.scene.add(angel);
+            self.angels.push(angel);
+        }
     });
 }
+
 
     
 setupXR() {
