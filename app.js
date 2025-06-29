@@ -473,15 +473,8 @@ render(timestamp, frame) {
     });
 }
 
-// 🩸 Animate blood drips
 if (this.bloodDrips && this.bloodDrips.length > 0) {
-    this.bloodDrips.forEach((drip, index) => {
-        drip.mesh.position.y -= 0.01; // Fall speed
-        if (drip.mesh.position.y < 0) {
-            this.scene.remove(drip.mesh);
-            this.bloodDrips.splice(index, 1); // Remove from list
-        }
-    });
+    this.bloodDrips = this.bloodDrips.filter(drip => drip.update(dt));
 }
 
 
