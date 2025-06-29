@@ -213,7 +213,7 @@ loader.load(
                 'WeepingAngels.glb',
                 function (gltf) {
                     const angels = gltf.scene;
-                    angels.scale.set(6, 6, 6);
+                    angels.scale.set(4, 4, 4);
                     angels.position.set(5, 0, -4);
                     self.scene.add(angels);
                     self.angels = angels;
