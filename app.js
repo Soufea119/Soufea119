@@ -272,6 +272,7 @@ spawnAngels() {
             wrapper.position.copy(pos);
 
             const angelClone = baseAngel.clone(true);
+	    angelClone.scale.set(6, 6, 6); // Bigger angels here
             angelClone.name = `Angel_${index}`;
             wrapper.add(angelClone);
 
