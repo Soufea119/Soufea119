@@ -160,21 +160,24 @@ loadCollege() {
             });
 
             // Load the cat model
-            loader.load(
-                'oiiaioooooiai_cat.glb',
-                function (gltf) {
-                    const cat = gltf.scene;
-                    cat.scale.set(2, 2, 2);
-                    cat.position.set(0, 0, -3);
-                    cat.visible = true;
-                    self.scene.add(cat);
-                    self.cat = cat;
-                },
-                undefined,
-                function (error) {
-                    console.error('An error occurred loading the cat model:', error);
-                }
-            );
+loader.load(
+    'oiiaioooooiai_cat.glb',
+    function (gltf) {
+        const cat = gltf.scene;
+        cat.scale.set(2, 2, 2);
+        cat.position.set(0, 0, -3);
+        cat.visible = true;
+        self.scene.add(cat);
+
+        if (!self.cats) self.cats = [];
+        self.cats.push(cat);
+    },
+    undefined,
+    function (error) {
+        console.error('An error occurred loading the cat model:', error);
+    }
+);
+
 
             // Load the Weeping Angels model
             loader.load(
@@ -386,8 +389,7 @@ loadCollege() {
 
 	if (this.cats && this.cats.length > 0) {
     const playerPos = this.dolly.position.clone();
-    const behindDir = new THREE.Vector3(0, 0, 1);
-    behindDir.applyQuaternion(this.dummyCam.quaternion).normalize();
+    const behindDir = new THREE.Vector3(0, 0, 1).applyQuaternion(this.dummyCam.quaternion).normalize();
 
     this.cats.forEach((cat, i) => {
         if (cat.visible) {
@@ -399,6 +401,7 @@ loadCollege() {
         }
     });
 }
+
 
 
 
