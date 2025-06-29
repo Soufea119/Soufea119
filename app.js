@@ -226,40 +226,31 @@ loader.load(
 
 
 
-   loader.load(
+ loader.load(
     'WeepingAngels.glb',
     function (gltf) {
         const basePosition = self.dolly.position.clone(); // Player spawn
-
-        const angelCount = 3; // How many angels to spawn
         self.angels = []; // Clear previous angels
 
-        for (let i = 0; i < angelCount; i++) {
-            const angel = gltf.scene.clone(true); // Deep clone
-            angel.scale.set(4, 4, 4); // Consistent size
+        const angel = gltf.scene.clone(true);
+        angel.scale.set(1, 1, 1); // Scale 1 = default
 
-            // Slight offset around player spawn
-            const offsetX = (i - 1) * 2; // e.g., -2, 0, 2
-            const offsetZ = -2; // Slightly behind player
+        // Place slightly in front of player
+        angel.position.set(
+            basePosition.x,
+            basePosition.y,
+            basePosition.z - 2
+        );
 
-            angel.position.set(
-                basePosition.x + offsetX,
-                basePosition.y,
-                basePosition.z + offsetZ
-            );
-
-            // Optional: rotate randomly for variety
-            angel.rotation.y = Math.random() * Math.PI * 2;
-
-            self.scene.add(angel);
-            self.angels.push(angel);
-        }
+        self.scene.add(angel);
+        self.angels.push(angel);
     },
     undefined,
     function (error) {
         console.error('Error loading Weeping Angels model:', error);
     }
 );
+
 
 
             // Setup door midpoint object
