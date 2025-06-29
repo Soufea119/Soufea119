@@ -199,44 +199,36 @@ loadCollege() {
                 }
             });
 
-          // Load the cat model
-loader.load(
-    'oiiaioooooiai_cat.glb',
-    function (gltf) {
-        const cat = gltf.scene;
-        cat.scale.set(2, 2, 2);
-        cat.position.set(0, 0, 0);
-        cat.visible = true;
+       loader.load('oiiaioooooiai_cat.glb', function (gltf) {
+    const cat = gltf.scene;
+    cat.scale.set(2, 2, 2);
+    cat.position.set(0, 0, 0);
+    cat.visible = true;
 
-        // Create wrapper for positioning
-        const wrapper = new THREE.Object3D();
-        wrapper.position.set(0, 0, -3);
-        wrapper.add(cat);
-        self.scene.add(wrapper);
+    const wrapper = new THREE.Object3D();
+    wrapper.position.set(0, 0, -3);
+    wrapper.add(cat);
+    self.scene.add(wrapper);
 
-        // 🔊 Add positional sound to the wrapper
-        const sound = new THREE.PositionalAudio(self.listener); // Already declared in your App
-        const audioLoader = new THREE.AudioLoader();
+    if (!self.cats) self.cats = [];
+    self.cats.push({ wrapper, cat });
 
-        audioLoader.load(self.assetsPath + 'CatMeow.mp3', function (buffer) {
-            sound.setBuffer(buffer);
-            sound.setRefDistance(5); // How far the sound can be heard clearly
-            sound.setLoop(true);     // Loop or not
-            sound.setVolume(0.5);    // Adjust as needed
-            sound.play();            // Play immediately
-        });
+    // 🔊 CAT SOUND: Set up audio
+    const listener = self.listener;
+    const catSound = new THREE.PositionalAudio(listener);
 
-        wrapper.add(sound); // Attach sound to cat wrapper
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load(self.assetsPath + 'cat_sound.mp3', function (buffer) {
+        catSound.setBuffer(buffer);
+        catSound.setRefDistance(5);
+        catSound.setLoop(true);
+        catSound.setVolume(0.5);
 
-        // Store for future use
-        if (!self.cats) self.cats = [];
-        self.cats.push({ wrapper, cat, sound }); // Save sound too if needed
-    },
-    undefined,
-    function (error) {
-        console.error('An error occurred loading the cat model:', error);
-    }
-);
+        cat.add(catSound); // Attach to cat model
+        self.catSound = catSound; // Store for later play
+    });
+});
+
 
 
 
