@@ -226,28 +226,30 @@ loader.load(
 
 
 
-          loader.load(
+         loader.load(
     'WeepingAngels.glb',
     function (gltf) {
         const baseAngel = gltf.scene;
-        baseAngel.scale.set(4, 4, 4); // Adjust size as needed
 
-        // Clear existing angels first
+        // Clear existing angels
         self.angels = [];
 
+        // Define spawn positions (close together)
         const positions = [
             new THREE.Vector3(5, 0, -4),
-            new THREE.Vector3(5.3, 0, -4.1),
-            new THREE.Vector3(4.7, 0, -4.2),
-            new THREE.Vector3(5.1, 0, -3.8)
+            new THREE.Vector3(5.5, 0, -4),
+            new THREE.Vector3(4.5, 0, -4),
+            new THREE.Vector3(5, 0, -3.5)
         ];
 
         positions.forEach(pos => {
-            const angel = baseAngel.clone();
+            const angel = baseAngel.clone(true); // Deep clone
+
+            angel.scale.set(4, 4, 4); // Keep same scale
             angel.position.copy(pos);
-            angel.traverse(child => {
-                if (child.isMesh) child.castShadow = true;
-            });
+
+            // Optional: small Y rotation for realism
+            angel.rotation.y = Math.random() * Math.PI * 2;
 
             self.scene.add(angel);
             self.angels.push(angel);
@@ -255,10 +257,9 @@ loader.load(
     },
     undefined,
     function (error) {
-        console.error('An error occurred loading the Weeping Angels model:', error);
+        console.error('Error loading Weeping Angels model:', error);
     }
 );
-
 
             // Setup door midpoint object
             const door1 = college.getObjectByName("LobbyShop_Door__1_");
