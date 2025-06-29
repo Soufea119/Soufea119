@@ -237,6 +237,8 @@ loadCollege() {
 
             self.loadingBar.visible = false;
             self.setupXR();
+	    self.spawnAngels();
+
         },
         function (xhr) {
             self.loadingBar.progress = (xhr.loaded / xhr.total);
