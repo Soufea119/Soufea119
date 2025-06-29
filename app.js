@@ -125,7 +125,7 @@ this.lastDripTime = 0;
 
 // Load blood texture
 const textureLoader = new THREE.TextureLoader();
-textureLoader.load(this.assetsPath + 'BloodDrip.png', (texture) => {
+textureLoader.load(this.assetsPath + 'Blooddrip.png', (texture) => {
     this.bloodTexture = texture;
 });
 
