@@ -393,19 +393,15 @@ loader.load(
 
     this.cats.forEach((cat, i) => {
         if (cat.visible) {
-            // Calculate a target position behind the player (with some offset)
             const offset = 1.5 + i * 1.5;
             const targetPos = playerPos.clone().addScaledVector(behindDir, offset);
-            targetPos.y = 0; // Keep cats on ground
-
-            // Smooth movement toward target
-            cat.position.lerp(targetPos, 0.02); // 0.02 = follow speed
-
-            // Optional: make cat face the player
+            targetPos.y = 0;
+            cat.position.lerp(targetPos, 0.02);
             cat.lookAt(playerPos.x, cat.position.y, playerPos.z);
         }
     });
 }
+
 
 
 
