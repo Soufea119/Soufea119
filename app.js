@@ -100,11 +100,9 @@ audioLoader.load(
 				angel.name = `angel_${i}`;
 				this.scene.add(angel);
 				this.angels.push(angel);
-			}
-		});
+     });
 	}
-}
-
+	
 
 		this.darkLight = new THREE.HemisphereLight(0x222222, 0x000000, 0.5);
                 this.darkLight.visible = false;
@@ -129,6 +127,7 @@ audioLoader.load(
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		this.renderer.outputEncoding = THREE.sRGBEncoding;
 		container.appendChild( this.renderer.domElement );
+
         this.setEnvironment();
 	
         window.addEventListener( 'resize', this.resize.bind(this) );
