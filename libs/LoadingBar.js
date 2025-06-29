@@ -13,14 +13,14 @@ class LoadingBar{
 		this.domElement.style.justifyContent = 'center';
 		this.domElement.style.zIndex = '1111';
 		const barBase = document.createElement("div");
-		barBase.style.background = '#aaa';
+		barBase.style.background = '#400';
 		barBase.style.width = '50%';
 		barBase.style.minWidth = '250px';
 		barBase.style.borderRadius = '10px';
 		barBase.style.height = '15px';
 		this.domElement.appendChild(barBase);
 		const bar = document.createElement("div");
-		bar.style.background = '#22a';
+		bar.style.background = '#f00';
 		bar.style.width = '50%';
 		bar.style.borderRadius = '10px';
 		bar.style.height = '100%';
