@@ -81,6 +81,8 @@ audioLoader.load(
 		this.angels = [];
                 this.spawnAngels(); // 👼 Spawn Weeping Angels
 
+	}
+
 		spawnAngels() {
     const loader = new GLTFLoader();
     loader.load(this.assetsPath + 'angel.glb', (gltf) => {
@@ -97,6 +99,7 @@ audioLoader.load(
             angel.name = `angel_${i}`;
             this.scene.add(angel);
             this.angels.push(angel);
+	   }
         }
     });
 }
